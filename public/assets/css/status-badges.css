@@ -1,0 +1,71 @@
+/* Status Badge Colors - Force Override Bootstrap */
+
+/* Primary Status (New) */
+.badge.bg-primary,
+.table .badge.bg-primary,
+.badge.bg-primary.text-white {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Warning Status (Scheduled) */
+.badge.bg-warning,
+.table .badge.bg-warning,
+.badge.bg-warning.text-white {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Success Status (Delivered) */
+.badge.bg-success,
+.table .badge.bg-success,
+.badge.bg-success.text-white {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Danger Status (Not Picking Calls) */
+.badge.bg-danger,
+.table .badge.bg-danger,
+.badge.bg-danger.text-white {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Info Status (Call Back) */
+.badge.bg-info,
+.table .badge.bg-info,
+.badge.bg-info.text-white {
+    background-color: #06b6d4 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Secondary Status (Number Off) */
+.badge.bg-secondary,
+.table .badge.bg-secondary,
+.badge.bg-secondary.text-white {
+    background-color: #6b7280 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Ensure all badges have proper styling */
+.table .badge {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 0.4em 0.8em !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Hover effects for badges */
+.badge:hover {
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}

@@ -1,0 +1,152 @@
+/* Alert Theming - Universal Theme Support */
+
+/* Primary Alert */
+.alert-primary {
+    background-color: rgba(var(--primary-rgb), 0.1) !important;
+    border-color: rgba(var(--primary-rgb), 0.2) !important;
+    color: var(--primary-dark) !important;
+}
+
+.alert-primary .alert-link {
+    color: var(--primary-dark) !important;
+}
+
+/* Secondary Alert */
+.alert-secondary {
+    background-color: rgba(var(--secondary-rgb), 0.1) !important;
+    border-color: rgba(var(--secondary-rgb), 0.2) !important;
+    color: var(--secondary-dark) !important;
+}
+
+.alert-secondary .alert-link {
+    color: var(--secondary-dark) !important;
+}
+
+/* Success Alert */
+.alert-success {
+    background-color: rgba(var(--success-rgb), 0.1) !important;
+    border-color: rgba(var(--success-rgb), 0.2) !important;
+    color: var(--success-dark) !important;
+}
+
+.alert-success .alert-link {
+    color: var(--success-dark) !important;
+}
+
+/* Danger Alert */
+.alert-danger {
+    background-color: rgba(var(--danger-rgb), 0.1) !important;
+    border-color: rgba(var(--danger-rgb), 0.2) !important;
+    color: var(--danger-dark) !important;
+}
+
+.alert-danger .alert-link {
+    color: var(--danger-dark) !important;
+}
+
+/* Warning Alert */
+.alert-warning {
+    background-color: rgba(var(--warning-rgb), 0.1) !important;
+    border-color: rgba(var(--warning-rgb), 0.2) !important;
+    color: var(--warning-dark) !important;
+}
+
+.alert-warning .alert-link {
+    color: var(--warning-dark) !important;
+}
+
+/* Info Alert */
+.alert-info {
+    background-color: rgba(var(--info-rgb), 0.1) !important;
+    border-color: rgba(var(--info-rgb), 0.2) !important;
+    color: var(--info-dark) !important;
+}
+
+.alert-info .alert-link {
+    color: var(--info-dark) !important;
+}
+
+/* Light Alert */
+.alert-light {
+    background-color: var(--light) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-primary) !important;
+}
+
+.alert-light .alert-link {
+    color: var(--text-primary) !important;
+}
+
+/* Dark Alert */
+.alert-dark {
+    background-color: var(--dark) !important;
+    border-color: var(--dark-light) !important;
+    color: #ffffff !important;
+}
+
+.alert-dark .alert-link {
+    color: #ffffff !important;
+}
+
+/* Theme-based Alert (uses primary theme color) */
+.alert-theme {
+    background-color: rgba(var(--primary-rgb), 0.1) !important;
+    border-color: rgba(var(--primary-rgb), 0.2) !important;
+    color: var(--primary-dark) !important;
+}
+
+.alert-theme .alert-link {
+    color: var(--primary-dark) !important;
+}
+
+/* Alert with Theme Primary Color */
+.alert-primary-theme {
+    background-color: var(--primary) !important;
+    border-color: var(--primary-dark) !important;
+    color: #ffffff !important;
+}
+
+.alert-primary-theme .alert-link {
+    color: #ffffff !important;
+}
+
+/* Alert Icons */
+.alert .ti {
+    margin-right: 0.5rem;
+}
+
+/* Alert Dismissible */
+.alert-dismissible .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='m.5 1.5 1.5 1.5L8 8l6-5 1.5 1.5L9.5 9.5l6 5L14 16l-6-5-6 5L.5 14.5l6-5L.5 1.5z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+}
+
+.alert-primary-theme .alert-dismissible .btn-close,
+.alert-dark .alert-dismissible .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='m.5 1.5 1.5 1.5L8 8l6-5 1.5 1.5L9.5 9.5l6 5L14 16l-6-5-6 5L.5 14.5l6-5L.5 1.5z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+}
+
+/* Custom Alert Variants */
+.alert-summary {
+    background-color: rgba(var(--primary-rgb), 0.1) !important;
+    border-color: rgba(var(--primary-rgb), 0.2) !important;
+    border-left: 4px solid var(--primary) !important;
+    color: var(--primary-dark) !important;
+}
+
+.alert-summary .alert-link {
+    color: var(--primary-dark) !important;
+}
+
+.alert-summary .ti {
+    color: var(--primary) !important;
+}
+
+/* Alert Animation */
+.alert {
+    transition: all 0.3s ease !important;
+}
+
+.alert:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}

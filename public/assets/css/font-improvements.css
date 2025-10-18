@@ -1,0 +1,213 @@
+/* Font Improvements - Better Typography */
+
+/* Import Google Fonts for better typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Apply Inter font to the entire application */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+}
+
+/* Improve heading typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+}
+
+/* Dashboard specific improvements */
+.page-title {
+    font-size: 1.75rem !important;
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
+}
+
+/* Card titles */
+.card-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
+}
+
+/* Metric cards improvements */
+.dashboard-metrics .card-body h4 {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #2c3e50 !important;
+}
+
+.dashboard-metrics .card-body p {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: #6c757d !important;
+}
+
+/* Sidebar improvements */
+.side-nav-link {
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+}
+
+.side-nav-title {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Table improvements */
+.table th {
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: #495057 !important;
+}
+
+.table td {
+    font-size: 0.9rem !important;
+    font-weight: 400 !important;
+}
+
+/* Badge improvements */
+.badge {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    padding: 0.4em 0.8em !important;
+}
+
+/* Button improvements */
+.btn {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    padding: 0.5rem 1rem !important;
+}
+
+/* Form improvements */
+.form-label {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: #495057 !important;
+}
+
+.form-control {
+    font-size: 0.9rem !important;
+    padding: 0.6rem 0.75rem !important;
+}
+
+/* Alert improvements */
+.alert {
+    font-size: 0.9rem !important;
+}
+
+/* Breadcrumb improvements */
+.breadcrumb {
+    font-size: 0.875rem !important;
+}
+
+.breadcrumb-item {
+    font-weight: 400 !important;
+}
+
+/* Footer improvements */
+footer {
+    font-size: 0.875rem !important;
+}
+
+/* Quick actions improvements */
+.quick-actions .btn {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+/* Status badge specific improvements */
+.table .badge {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Ensure status badge colors are visible - More specific selectors */
+.table .badge.bg-primary,
+.badge.bg-primary {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+.table .badge.bg-warning,
+.badge.bg-warning {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+}
+
+.table .badge.bg-success,
+.badge.bg-success {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+}
+
+.table .badge.bg-danger,
+.badge.bg-danger {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+.table .badge.bg-info,
+.badge.bg-info {
+    background-color: #06b6d4 !important;
+    color: #ffffff !important;
+}
+
+.table .badge.bg-secondary,
+.badge.bg-secondary {
+    background-color: #6b7280 !important;
+    color: #ffffff !important;
+}
+
+/* Additional specificity for Bootstrap overrides */
+.badge.bg-primary.text-white,
+.badge.bg-warning.text-white,
+.badge.bg-success.text-white,
+.badge.bg-danger.text-white,
+.badge.bg-info.text-white,
+.badge.bg-secondary.text-white {
+    color: #ffffff !important;
+}
+
+/* Improve readability */
+.text-muted {
+    color: #6c757d !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+/* Responsive font adjustments */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px !important;
+    }
+
+    .dashboard-metrics .card-body h4 {
+        font-size: 1.75rem !important;
+    }
+
+    .page-title {
+        font-size: 1.5rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    body {
+        font-size: 13px !important;
+    }
+
+    .dashboard-metrics .card-body h4 {
+        font-size: 1.5rem !important;
+    }
+
+    .page-title {
+        font-size: 1.25rem !important;
+    }
+}

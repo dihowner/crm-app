@@ -1,0 +1,104 @@
+/* Mobile Navigation - Theme-Aware Header */
+
+/* Mobile Header Bar - High Specificity with Theme Support */
+body .mobile-header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 60px !important;
+    background: var(--sidebar-bg, #2c3e50) !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 20px !important;
+    z-index: 9999 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Theme-specific header colors */
+.theme-blue .mobile-header {
+    background: #1e293b !important; /* Dark blue */
+}
+
+.theme-red .mobile-header {
+    background: #7f1d1d !important; /* Dark red */
+}
+
+.theme-green .mobile-header {
+    background: #14532d !important; /* Dark green */
+}
+
+.theme-purple .mobile-header {
+    background: #581c87 !important; /* Dark purple */
+}
+
+.theme-orange .mobile-header {
+    background: #9a3412 !important; /* Dark orange */
+}
+
+.theme-pink .mobile-header {
+    background: #831843 !important; /* Dark pink */
+}
+
+.theme-teal .mobile-header {
+    background: #134e4a !important; /* Dark teal */
+}
+
+.theme-dark .mobile-header {
+    background: #111827 !important; /* Dark gray/black */
+}
+
+/* Mobile Menu Toggle Button - High Specificity */
+body .mobile-header .sidenav-toggle-button {
+    background: none !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 20px !important;
+    padding: 8px !important;
+    margin-right: 15px !important;
+    cursor: pointer !important;
+    border-radius: 4px !important;
+    transition: background-color 0.2s ease !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+body .mobile-header .sidenav-toggle-button:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Mobile Title - High Specificity */
+body .mobile-title {
+    color: #ffffff !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    flex: 1 !important;
+}
+
+/* Mobile sidebar behavior is handled by the original template */
+/* Content padding for mobile header - High Specificity */
+@media (max-width: 991.98px) {
+    body .content-page {
+        padding-top: 60px !important;
+    }
+
+    body .page-title-box {
+        padding-top: 20px !important;
+    }
+}
+
+/* Desktop - hide mobile header - High Specificity */
+@media (min-width: 992px) {
+    body .mobile-header {
+        display: none !important;
+    }
+
+    body .content-page {
+        padding-top: 0 !important;
+    }
+
+    body .page-title-box {
+        padding-top: 0 !important;
+    }
+}

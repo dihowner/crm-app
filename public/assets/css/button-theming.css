@@ -1,0 +1,245 @@
+/* Button Theming - Universal Theme Support */
+
+/* Primary Buttons - Background Color */
+.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: #ffffff !important;
+}
+
+/* Primary Outline Buttons */
+.btn-outline-primary {
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+/* Secondary Buttons */
+.btn-secondary {
+    background-color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+    color: #ffffff !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active,
+.btn-secondary.active {
+    background-color: var(--secondary-dark) !important;
+    border-color: var(--secondary-dark) !important;
+    color: #ffffff !important;
+}
+
+/* Secondary Outline Buttons */
+.btn-outline-secondary {
+    color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-secondary:active,
+.btn-outline-secondary.active {
+    background-color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+    color: #ffffff !important;
+}
+
+/* Success Buttons */
+.btn-success {
+    background-color: var(--success) !important;
+    border-color: var(--success) !important;
+    color: #ffffff !important;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active,
+.btn-success.active {
+    background-color: var(--success-dark) !important;
+    border-color: var(--success-dark) !important;
+    color: #ffffff !important;
+}
+
+/* Danger Buttons */
+.btn-danger {
+    background-color: var(--danger) !important;
+    border-color: var(--danger) !important;
+    color: #ffffff !important;
+}
+
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:active,
+.btn-danger.active {
+    background-color: var(--danger-dark) !important;
+    border-color: var(--danger-dark) !important;
+    color: #ffffff !important;
+}
+
+/* Warning Buttons */
+.btn-warning {
+    background-color: var(--warning) !important;
+    border-color: var(--warning) !important;
+    color: #ffffff !important;
+}
+
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-warning:active,
+.btn-warning.active {
+    background-color: var(--warning-dark) !important;
+    border-color: var(--warning-dark) !important;
+    color: #ffffff !important;
+}
+
+/* Info Buttons */
+.btn-info {
+    background-color: var(--info) !important;
+    border-color: var(--info) !important;
+    color: #ffffff !important;
+}
+
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active,
+.btn-info.active {
+    background-color: var(--info-dark) !important;
+    border-color: var(--info-dark) !important;
+    color: #ffffff !important;
+}
+
+/* Light Buttons */
+.btn-light {
+    background-color: var(--light) !important;
+    border-color: var(--light) !important;
+    color: var(--text-primary) !important;
+}
+
+.btn-light:hover,
+.btn-light:focus,
+.btn-light:active,
+.btn-light.active {
+    background-color: var(--light-dark) !important;
+    border-color: var(--light-dark) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Dark Buttons */
+.btn-dark {
+    background-color: var(--dark) !important;
+    border-color: var(--dark) !important;
+    color: #ffffff !important;
+}
+
+.btn-dark:hover,
+.btn-dark:focus,
+.btn-dark:active,
+.btn-dark.active {
+    background-color: var(--dark-light) !important;
+    border-color: var(--dark-light) !important;
+    color: #ffffff !important;
+}
+
+/* Link Buttons */
+.btn-link {
+    color: var(--primary) !important;
+    text-decoration: none !important;
+}
+
+.btn-link:hover,
+.btn-link:focus {
+    color: var(--primary-dark) !important;
+    text-decoration: underline !important;
+}
+
+/* Focus States */
+.btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25) !important;
+}
+
+/* Button Groups */
+.btn-group .btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25) !important;
+}
+
+/* Dropdown Buttons */
+.dropdown-toggle:after {
+    border-top-color: currentColor !important;
+}
+
+/* Pagination Buttons */
+.page-link {
+    color: var(--primary) !important;
+    border-color: var(--border-light) !important;
+}
+
+.page-link:hover {
+    color: var(--primary-dark) !important;
+    background-color: var(--light) !important;
+    border-color: var(--border-light) !important;
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+/* Close Buttons */
+.btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='m.5 1.5 1.5 1.5L8 8l6-5 1.5 1.5L9.5 9.5l6 5L14 16l-6-5-6 5L.5 14.5l6-5L.5 1.5z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+}
+
+/* Modal Buttons */
+.modal-header .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='m.5 1.5 1.5 1.5L8 8l6-5 1.5 1.5L9.5 9.5l6 5L14 16l-6-5-6 5L.5 14.5l6-5L.5 1.5z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+}
+
+/* Custom Button Variants */
+.btn-theme {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+.btn-theme:hover,
+.btn-theme:focus,
+.btn-theme:active {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: #ffffff !important;
+}
+
+.btn-theme-outline {
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    background-color: transparent !important;
+}
+
+.btn-theme-outline:hover,
+.btn-theme-outline:focus,
+.btn-theme-outline:active {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+}

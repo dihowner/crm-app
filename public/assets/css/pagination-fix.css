@@ -1,0 +1,61 @@
+/* Pagination Styling Fix */
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-link {
+    color: var(--primary);
+    border-color: var(--border-color);
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    min-width: 2.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: var(--text-muted);
+    background-color: var(--light);
+    border-color: var(--border-color);
+}
+
+.pagination .page-link i {
+    font-size: 0.875rem;
+}
+
+/* Pagination info text */
+.pagination-info {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+/* Ensure proper spacing */
+.pagination-container {
+    margin-top: 1.5rem;
+}
+
+/* Remove any oversized icons or distorted elements */
+.pagination .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.5rem;
+}
+
+/* Fix any Bootstrap 4 pagination issues */
+.pagination .page-link:focus {
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25);
+}

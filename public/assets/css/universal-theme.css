@@ -1,0 +1,162 @@
+/* Universal Theme System - Easy Multi-Brand Deployment */
+
+:root {
+  /* Primary Brand Colors */
+  --primary: #6366f1;          /* Indigo - Main brand color */
+  --primary-dark: #4f46e5;     /* Darker shade for hover states */
+  --primary-light: #a5b4fc;    /* Lighter shade for backgrounds */
+  --primary-rgb: 99, 102, 241; /* RGB values for opacity effects */
+
+  /* Secondary Colors */
+  --secondary: #64748b;        /* Slate - Secondary actions */
+  --secondary-dark: #475569;
+  --secondary-light: #94a3b8;
+  --secondary-rgb: 100, 116, 139;
+
+  /* Accent Colors */
+  --accent: #10b981;           /* Emerald - Success/positive actions */
+  --accent-dark: #059669;
+  --accent-light: #6ee7b7;
+  --accent-rgb: 16, 185, 129;
+
+  /* Warning & Error Colors */
+  --warning: #f59e0b;          /* Amber - Warning states */
+  --warning-dark: #d97706;
+  --warning-light: #fbbf24;
+  --warning-rgb: 245, 158, 11;
+
+  --danger: #ef4444;           /* Red - Error/danger states */
+  --danger-dark: #dc2626;
+  --danger-light: #f87171;
+  --danger-rgb: 239, 68, 68;
+
+  /* Info & Neutral Colors */
+  --info: #06b6d4;             /* Cyan - Info states */
+  --info-dark: #0891b2;
+  --info-light: #67e8f9;
+  --info-rgb: 6, 182, 212;
+
+  --dark: #1f2937;             /* Dark gray */
+  --light: #f8fafc;            /* Light gray */
+  --muted: #6b7280;            /* Muted text */
+
+  /* Background Colors */
+  --bg-primary: #ffffff;       /* Main background */
+  --bg-secondary: #f8fafc;     /* Secondary background */
+  --bg-dark: #1f2937;          /* Dark background */
+
+  /* Text Colors */
+  --text-primary: #111827;     /* Primary text */
+  --text-secondary: #6b7280;   /* Secondary text */
+  --text-muted: #9ca3af;       /* Muted text */
+  --text-white: #ffffff;       /* White text */
+
+  /* Border Colors */
+  --border-light: #e5e7eb;     /* Light borders */
+  --border-medium: #d1d5db;    /* Medium borders */
+  --border-dark: #9ca3af;      /* Dark borders */
+
+  /* Shadow Colors */
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-dark: rgba(0, 0, 0, 0.25);
+
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+
+  /* Login Page Specific */
+  --login-bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #ffffff 100%);
+  --login-card-shadow: 0 20px 25px -5px var(--shadow-light), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Dark Theme Support */
+[data-theme="dark"] {
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --border-light: #374151;
+  --border-medium: #4b5563;
+  --border-dark: #6b7280;
+  --login-bg-gradient: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+/* Bootstrap Color Overrides */
+.btn-primary {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+.btn-secondary {
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+}
+
+.btn-success {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+.btn-warning {
+  background-color: var(--warning) !important;
+  border-color: var(--warning) !important;
+}
+
+.btn-danger {
+  background-color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+
+.btn-info {
+  background-color: var(--info) !important;
+  border-color: var(--info) !important;
+}
+
+/* Alert Colors */
+.alert-danger {
+  background-color: rgba(var(--danger-rgb), 0.1) !important;
+  border-color: var(--danger-light) !important;
+  color: var(--danger-dark) !important;
+}
+
+.alert-success {
+  background-color: rgba(var(--accent-rgb), 0.1) !important;
+  border-color: var(--accent-light) !important;
+  color: var(--accent-dark) !important;
+}
+
+.alert-warning {
+  background-color: rgba(var(--warning-rgb), 0.1) !important;
+  border-color: var(--warning-light) !important;
+  color: var(--warning-dark) !important;
+}
+
+.alert-info {
+  background-color: rgba(var(--info-rgb), 0.1) !important;
+  border-color: var(--info-light) !important;
+  color: var(--info-dark) !important;
+}
+
+/* Text Colors */
+.text-primary { color: var(--primary) !important; }
+.text-secondary { color: var(--secondary) !important; }
+.text-success { color: var(--accent) !important; }
+.text-warning { color: var(--warning) !important; }
+.text-danger { color: var(--danger) !important; }
+.text-info { color: var(--info) !important; }
+
+/* Background Colors */
+.bg-primary { background-color: var(--primary) !important; }
+.bg-secondary { background-color: var(--secondary) !important; }
+.bg-success { background-color: var(--accent) !important; }
+.bg-warning { background-color: var(--warning) !important; }
+.bg-danger { background-color: var(--danger) !important; }
+.bg-info { background-color: var(--info) !important; }

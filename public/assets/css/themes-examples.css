@@ -1,0 +1,450 @@
+/* Theme Examples - Easy Rebranding */
+
+/* Example: Green Theme */
+.theme-green {
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --primary-light: #6ee7b7;
+  --primary-rgb: 16, 185, 129;
+  --accent: #6366f1;
+  --accent-dark: #4f46e5;
+  --accent-light: #a5b4fc;
+  --accent-rgb: 99, 102, 241;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--primary-dark), var(--primary-light));
+
+  /* Background */
+  --login-bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+
+  /* Shadows */
+  --shadow-light: rgba(var(--primary-rgb), 0.1);
+  --shadow-medium: rgba(var(--primary-rgb), 0.2);
+  --login-card-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  /* Borders */
+  --border-light: rgba(var(--primary-rgb), 0.1);
+  --border-medium: rgba(var(--primary-rgb), 0.2);
+  --border-dark: rgba(var(--primary-rgb), 0.3);
+
+  /* Button Colors */
+  --secondary: #6b7280;
+  --secondary-dark: #4b5563;
+  --secondary-rgb: 107, 114, 128;
+  --success: #10b981;
+  --success-dark: #059669;
+  --success-rgb: 16, 185, 129;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-rgb: 239, 68, 68;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-dark: #2563eb;
+  --info-rgb: 59, 130, 246;
+  --light: #f9fafb;
+  --light-dark: #f3f4f6;
+  --dark: #1f2937;
+  --dark-light: #374151;
+}
+
+/* Example: Purple Theme */
+.theme-purple {
+  --primary: #8b5cf6;
+  --primary-dark: #7c3aed;
+  --primary-light: #c4b5fd;
+  --primary-rgb: 139, 92, 246;
+  --accent: #f59e0b;
+  --accent-dark: #d97706;
+  --accent-light: #fbbf24;
+  --accent-rgb: 245, 158, 11;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--primary-dark), var(--primary-light));
+
+  /* Background */
+  --login-bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+
+  /* Shadows */
+  --shadow-light: rgba(var(--primary-rgb), 0.1);
+  --shadow-medium: rgba(var(--primary-rgb), 0.2);
+  --login-card-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  /* Borders */
+  --border-light: rgba(var(--primary-rgb), 0.1);
+  --border-medium: rgba(var(--primary-rgb), 0.2);
+  --border-dark: rgba(var(--primary-rgb), 0.3);
+
+  /* Button Colors */
+  --secondary: #6b7280;
+  --secondary-dark: #4b5563;
+  --secondary-rgb: 107, 114, 128;
+  --success: #10b981;
+  --success-dark: #059669;
+  --success-rgb: 16, 185, 129;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-rgb: 239, 68, 68;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-dark: #2563eb;
+  --info-rgb: 59, 130, 246;
+  --light: #f9fafb;
+  --light-dark: #f3f4f6;
+  --dark: #1f2937;
+  --dark-light: #374151;
+}
+
+/* Example: Blue Theme */
+.theme-blue {
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #93c5fd;
+  --primary-rgb: 59, 130, 246;
+  --accent: #10b981;
+  --accent-dark: #059669;
+  --accent-light: #6ee7b7;
+  --accent-rgb: 16, 185, 129;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--primary-dark), var(--primary-light));
+
+  /* Background */
+  --login-bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+
+  /* Shadows */
+  --shadow-light: rgba(var(--primary-rgb), 0.1);
+  --shadow-medium: rgba(var(--primary-rgb), 0.2);
+  --login-card-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  /* Borders */
+  --border-light: rgba(var(--primary-rgb), 0.1);
+  --border-medium: rgba(var(--primary-rgb), 0.2);
+  --border-dark: rgba(var(--primary-rgb), 0.3);
+
+  /* Button Colors */
+  --secondary: #6b7280;
+  --secondary-dark: #4b5563;
+  --secondary-rgb: 107, 114, 128;
+  --success: #10b981;
+  --success-dark: #059669;
+  --success-rgb: 16, 185, 129;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-rgb: 239, 68, 68;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-dark: #2563eb;
+  --info-rgb: 59, 130, 246;
+  --light: #f9fafb;
+  --light-dark: #f3f4f6;
+  --dark: #1f2937;
+  --dark-light: #374151;
+}
+
+/* Example: Red Theme */
+.theme-red {
+  --primary: #ef4444;
+  --primary-dark: #dc2626;
+  --primary-light: #f87171;
+  --primary-rgb: 239, 68, 68;
+  --accent: #f59e0b;
+  --accent-dark: #d97706;
+  --accent-light: #fbbf24;
+  --accent-rgb: 245, 158, 11;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--primary-dark), var(--primary-light));
+
+  /* Background */
+  --login-bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+
+  /* Shadows */
+  --shadow-light: rgba(var(--primary-rgb), 0.1);
+  --shadow-medium: rgba(var(--primary-rgb), 0.2);
+  --login-card-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  /* Borders */
+  --border-light: rgba(var(--primary-rgb), 0.1);
+  --border-medium: rgba(var(--primary-rgb), 0.2);
+  --border-dark: rgba(var(--primary-rgb), 0.3);
+
+  /* Button Colors */
+  --secondary: #6b7280;
+  --secondary-dark: #4b5563;
+  --secondary-rgb: 107, 114, 128;
+  --success: #10b981;
+  --success-dark: #059669;
+  --success-rgb: 16, 185, 129;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-rgb: 239, 68, 68;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-dark: #2563eb;
+  --info-rgb: 59, 130, 246;
+  --light: #f9fafb;
+  --light-dark: #f3f4f6;
+  --dark: #1f2937;
+  --dark-light: #374151;
+}
+
+/* Example: Orange Theme */
+.theme-orange {
+  --primary: #f97316;
+  --primary-dark: #ea580c;
+  --primary-light: #fdba74;
+  --primary-rgb: 249, 115, 22;
+  --accent: #06b6d4;
+  --accent-dark: #0891b2;
+  --accent-light: #67e8f9;
+  --accent-rgb: 6, 182, 212;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--primary-dark), var(--primary-light));
+
+  /* Background */
+  --login-bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+
+  /* Shadows */
+  --shadow-light: rgba(var(--primary-rgb), 0.1);
+  --shadow-medium: rgba(var(--primary-rgb), 0.2);
+  --login-card-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  /* Borders */
+  --border-light: rgba(var(--primary-rgb), 0.1);
+  --border-medium: rgba(var(--primary-rgb), 0.2);
+  --border-dark: rgba(var(--primary-rgb), 0.3);
+
+  /* Button Colors */
+  --secondary: #6b7280;
+  --secondary-dark: #4b5563;
+  --secondary-rgb: 107, 114, 128;
+  --success: #10b981;
+  --success-dark: #059669;
+  --success-rgb: 16, 185, 129;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-rgb: 239, 68, 68;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-dark: #2563eb;
+  --info-rgb: 59, 130, 246;
+  --light: #f9fafb;
+  --light-dark: #f3f4f6;
+  --dark: #1f2937;
+  --dark-light: #374151;
+}
+
+/* Example: Pink Theme */
+.theme-pink {
+  --primary: #ec4899;
+  --primary-dark: #db2777;
+  --primary-light: #f9a8d4;
+  --primary-rgb: 236, 72, 153;
+  --accent: #8b5cf6;
+  --accent-dark: #7c3aed;
+  --accent-light: #c4b5fd;
+  --accent-rgb: 139, 92, 246;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--primary-dark), var(--primary-light));
+
+  /* Background */
+  --login-bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+
+  /* Shadows */
+  --shadow-light: rgba(var(--primary-rgb), 0.1);
+  --shadow-medium: rgba(var(--primary-rgb), 0.2);
+  --login-card-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  /* Borders */
+  --border-light: rgba(var(--primary-rgb), 0.1);
+  --border-medium: rgba(var(--primary-rgb), 0.2);
+  --border-dark: rgba(var(--primary-rgb), 0.3);
+
+  /* Button Colors */
+  --secondary: #6b7280;
+  --secondary-dark: #4b5563;
+  --secondary-rgb: 107, 114, 128;
+  --success: #10b981;
+  --success-dark: #059669;
+  --success-rgb: 16, 185, 129;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-rgb: 239, 68, 68;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-dark: #2563eb;
+  --info-rgb: 59, 130, 246;
+  --light: #f9fafb;
+  --light-dark: #f3f4f6;
+  --dark: #1f2937;
+  --dark-light: #374151;
+}
+
+/* Example: Teal Theme */
+.theme-teal {
+  --primary: #14b8a6;
+  --primary-dark: #0d9488;
+  --primary-light: #5eead4;
+  --primary-rgb: 20, 184, 166;
+  --accent: #f59e0b;
+  --accent-dark: #d97706;
+  --accent-light: #fbbf24;
+  --accent-rgb: 245, 158, 11;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--primary-dark), var(--primary-light));
+
+  /* Background */
+  --login-bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+
+  /* Shadows */
+  --shadow-light: rgba(var(--primary-rgb), 0.1);
+  --shadow-medium: rgba(var(--primary-rgb), 0.2);
+  --login-card-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  /* Borders */
+  --border-light: rgba(var(--primary-rgb), 0.1);
+  --border-medium: rgba(var(--primary-rgb), 0.2);
+  --border-dark: rgba(var(--primary-rgb), 0.3);
+
+  /* Button Colors */
+  --secondary: #6b7280;
+  --secondary-dark: #4b5563;
+  --secondary-rgb: 107, 114, 128;
+  --success: #10b981;
+  --success-dark: #059669;
+  --success-rgb: 16, 185, 129;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-rgb: 239, 68, 68;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-dark: #2563eb;
+  --info-rgb: 59, 130, 246;
+  --light: #f9fafb;
+  --light-dark: #f3f4f6;
+  --dark: #1f2937;
+  --dark-light: #374151;
+}
+
+/* Example: Dark Theme */
+.theme-dark {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #a5b4fc;
+  --primary-rgb: 99, 102, 241;
+  --accent: #10b981;
+  --accent-dark: #059669;
+  --accent-light: #6ee7b7;
+  --accent-rgb: 16, 185, 129;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--primary-dark), var(--primary-light));
+
+  /* Background */
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --login-bg-gradient: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+
+  /* Shadows */
+  --shadow-light: rgba(var(--primary-rgb), 0.1);
+  --shadow-medium: rgba(var(--primary-rgb), 0.2);
+  --login-card-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+
+  /* Text Colors */
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+
+  /* Borders */
+  --border-light: #374151;
+  --border-medium: #4b5563;
+  --border-dark: #6b7280;
+
+  /* Button Colors */
+  --secondary: #6b7280;
+  --secondary-dark: #4b5563;
+  --secondary-rgb: 107, 114, 128;
+  --success: #10b981;
+  --success-dark: #059669;
+  --success-rgb: 16, 185, 129;
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-rgb: 239, 68, 68;
+  --warning: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-rgb: 245, 158, 11;
+  --info: #3b82f6;
+  --info-dark: #2563eb;
+  --info-rgb: 59, 130, 246;
+  --light: #f9fafb;
+  --light-dark: #f3f4f6;
+  --dark: #1f2937;
+  --dark-light: #374151;
+}
+
+/* Usage Examples:
+   To apply a theme, simply add the theme class to the <html> or <body> tag:
+
+   <html class="theme-green">     <!-- Green theme -->
+   <html class="theme-purple">    <!-- Purple theme -->
+   <html class="theme-blue">      <!-- Blue theme -->
+   <html class="theme-red">       <!-- Red theme -->
+   <html class="theme-orange">    <!-- Orange theme -->
+   <html class="theme-pink">      <!-- Pink theme -->
+   <html class="theme-teal">      <!-- Teal theme -->
+   <html class="theme-dark">      <!-- Dark theme -->
+
+   Or create your own custom theme by overriding the CSS variables!
+*/

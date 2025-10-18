@@ -1,0 +1,148 @@
+/* Dynamic Sidebar Theming */
+
+/* Base sidebar styles - will be overridden by theme classes */
+.sidenav-menu {
+    background-color: #1e293b; /* Default dark blue */
+    transition: background-color 0.3s ease;
+}
+
+/* Theme-specific sidebar colors */
+.theme-blue .sidenav-menu {
+    background-color: #1e293b; /* Dark blue */
+}
+
+.theme-red .sidenav-menu {
+    background-color: #7f1d1d; /* Dark red */
+}
+
+.theme-green .sidenav-menu {
+    background-color: #14532d; /* Dark green */
+}
+
+.theme-purple .sidenav-menu {
+    background-color: #581c87; /* Dark purple */
+}
+
+.theme-orange .sidenav-menu {
+    background-color: #9a3412; /* Dark orange */
+}
+
+.theme-pink .sidenav-menu {
+    background-color: #831843; /* Dark pink */
+}
+
+.theme-teal .sidenav-menu {
+    background-color: #134e4a; /* Dark teal */
+}
+
+.theme-dark .sidenav-menu {
+    background-color: #111827; /* Dark gray/black */
+}
+
+/* Ensure sidebar text remains white and readable */
+.sidenav-menu .side-nav-link,
+.sidenav-menu .side-nav-title,
+.sidenav-menu .menu-text,
+.sidenav-menu .menu-icon {
+    color: #ffffff !important;
+}
+
+/* Hover effects - theme-aware */
+.theme-blue .sidenav-menu .side-nav-link:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #ffffff !important;
+}
+
+.theme-red .sidenav-menu .side-nav-link:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ffffff !important;
+}
+
+.theme-green .sidenav-menu .side-nav-link:hover {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #ffffff !important;
+}
+
+.theme-purple .sidenav-menu .side-nav-link:hover {
+    background-color: rgba(139, 92, 246, 0.2);
+    color: #ffffff !important;
+}
+
+.theme-orange .sidenav-menu .side-nav-link:hover {
+    background-color: rgba(249, 115, 22, 0.2);
+    color: #ffffff !important;
+}
+
+.theme-pink .sidenav-menu .side-nav-link:hover {
+    background-color: rgba(236, 72, 153, 0.2);
+    color: #ffffff !important;
+}
+
+.theme-teal .sidenav-menu .side-nav-link:hover {
+    background-color: rgba(20, 184, 166, 0.2);
+    color: #ffffff !important;
+}
+
+.theme-dark .sidenav-menu .side-nav-link:hover {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: #ffffff !important;
+}
+
+/* Active menu item - theme-aware */
+.theme-blue .sidenav-menu .side-nav-link.active {
+    background-color: rgba(59, 130, 246, 0.3); /* Blue with transparency */
+    color: #ffffff !important;
+}
+
+.theme-red .sidenav-menu .side-nav-link.active {
+    background-color: rgba(239, 68, 68, 0.3); /* Red with transparency */
+    color: #ffffff !important;
+}
+
+.theme-green .sidenav-menu .side-nav-link.active {
+    background-color: rgba(16, 185, 129, 0.3); /* Green with transparency */
+    color: #ffffff !important;
+}
+
+.theme-purple .sidenav-menu .side-nav-link.active {
+    background-color: rgba(139, 92, 246, 0.3); /* Purple with transparency */
+    color: #ffffff !important;
+}
+
+.theme-orange .sidenav-menu .side-nav-link.active {
+    background-color: rgba(249, 115, 22, 0.3); /* Orange with transparency */
+    color: #ffffff !important;
+}
+
+.theme-pink .sidenav-menu .side-nav-link.active {
+    background-color: rgba(236, 72, 153, 0.3); /* Pink with transparency */
+    color: #ffffff !important;
+}
+
+.theme-teal .sidenav-menu .side-nav-link.active {
+    background-color: rgba(20, 184, 166, 0.3); /* Teal with transparency */
+    color: #ffffff !important;
+}
+
+.theme-dark .sidenav-menu .side-nav-link.active {
+    background-color: rgba(99, 102, 241, 0.3); /* Dark theme purple with transparency */
+    color: #ffffff !important;
+}
+
+/* Logo area theming */
+.sidenav-menu .logo {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Badge colors should remain consistent */
+.sidenav-menu .badge {
+    background-color: #3b82f6 !important; /* Keep blue badges */
+    color: #ffffff !important;
+}
+
+/* Responsive sidebar adjustments */
+@media (max-width: 768px) {
+    .sidenav-menu {
+        background-color: inherit; /* Let theme handle it */
+    }
+}
