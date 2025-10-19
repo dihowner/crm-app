@@ -198,7 +198,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                @if(auth()->user()->isAdmin() || $order->assigned_to === auth()->id())
+                @if(auth()->user()->isAdmin() || (string)$order->assigned_to === (string)auth()->id())
                     <form action="{{ route('orders.update-status', $order) }}" method="POST">
                         @csrf
                         @method('PATCH')
@@ -269,7 +269,7 @@
                     <a href="tel:{{ $order->customer->phone }}" class="btn btn-outline-success">
                         <i class="ti ti-phone me-1"></i>Call Customer
                     </a>
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $order->customer->phone) }}" class="btn btn-outline-success" target="_blank">
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $order->customer->whatsapp_number ?? $order->customer->phone) }}" class="btn btn-outline-success" target="_blank">
                         <i class="ti ti-brand-whatsapp me-1"></i>WhatsApp
                     </a>
                 </div>

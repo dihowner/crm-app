@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\PhoneNumberHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -27,6 +28,22 @@ class Customer extends Model
         'last_order_date' => 'datetime',
         'total_spent' => 'decimal:2',
     ];
+
+    /**
+     * Set the phone attribute with country code conversion
+     */
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['phone'] = PhoneNumberHelper::convertToCountryCode($value);
+    }
+
+    /**
+     * Set the whatsapp_number attribute with country code conversion
+     */
+    public function setWhatsappNumberAttribute($value)
+    {
+        $this->attributes['whatsapp_number'] = PhoneNumberHelper::convertToCountryCode($value);
+    }
 
     /**
      * Get the orders for the customer.

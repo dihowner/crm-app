@@ -197,7 +197,7 @@
                     <a href="tel:{{ $customer->phone }}" class="btn btn-outline-success">
                         <i class="ti ti-phone me-1"></i>Call Customer
                     </a>
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $customer->phone) }}" class="btn btn-outline-success" target="_blank">
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $customer->whatsapp_number ?? $customer->phone) }}" class="btn btn-outline-success" target="_blank">
                         <i class="ti ti-brand-whatsapp me-1"></i>WhatsApp
                     </a>
                     <button class="btn btn-outline-primary" onclick="copyCustomerInfo(this)">
