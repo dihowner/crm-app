@@ -95,7 +95,7 @@ class PaymentController extends Controller
 
         // Check if user can add payment for this order
         $order = Order::findOrFail($request->order_id);
-        if (Auth::user()->isCSR() && $order->assigned_to !== Auth::id()) {
+        if (Auth::user()->isCSR() && (string)$order->assigned_to !== (string)Auth::id()) {
             return response()->json(['error' => 'You can only add payments for orders assigned to you.'], 403);
         }
 
@@ -132,7 +132,7 @@ class PaymentController extends Controller
     public function getOrderPayments(Order $order)
     {
         // Check if user can view payments for this order
-        if (Auth::user()->isCSR() && $order->assigned_to !== Auth::id()) {
+        if (Auth::user()->isCSR() && (string)$order->assigned_to !== (string)Auth::id()) {
             return response()->json(['error' => 'You can only view payments for orders assigned to you.'], 403);
         }
 

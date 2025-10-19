@@ -180,26 +180,9 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        // Debug logging for live server
-        \Log::info('Order Show Debug:', [
-            'user_id' => Auth::id(),
-            'user_email' => Auth::user()->email ?? 'No user',
-            'order_id' => $order->id,
-            'order_assigned_to' => $order->assigned_to,
-            'is_csr' => Auth::user()->isCSR() ?? false,
-            'comparison' => $order->assigned_to !== Auth::id()
-        ]);
-
         // Check if user can view this order
-        if (Auth::user()->isCSR() && $order->assigned_to !== Auth::id()) {
-            // Temporary fix: Allow CSR to view orders if they are the creator or if assigned_to matches
-            $currentUserId = Auth::id();
-            $assignedUserId = $order->assigned_to;
-
-            // If the comparison is failing due to type mismatch, try string comparison
-            if ((string)$assignedUserId !== (string)$currentUserId) {
-                abort(403, 'You can only view orders assigned to you.');
-            }
+        if (Auth::user()->isCSR() && (string)$order->assigned_to !== (string)Auth::id()) {
+            abort(403, 'You can only view orders assigned to you.');
         }
 
         // Logistic Managers can only access inventory pages
