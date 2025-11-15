@@ -20,19 +20,19 @@
         <div class="card">
             <div class="card-body">
                 <form method="GET" action="{{ route('orders.overdue') }}" class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="order_status" class="form-label">Status</label>
                         <select class="form-select" id="order_status" name="status">
                             <option value="">All Statuses</option>
                             @foreach($statuses as $status)
                                 <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>
-                                    {{ ucfirst($status) }}
+                                    {{ ucfirst(str_replace('_', ' ', $status)) }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="assigned_to" class="form-label">Assigned To</label>
                         <select class="form-select" id="assigned_to" name="assigned_to">
                             <option value="">All</option>
@@ -44,19 +44,44 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <label for="product_id" class="form-label">Product</label>
+                        <select class="form-select" id="product_id" name="product_id">
+                            <option value="">All Products</option>
+                            @foreach($products as $product)
+                                <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
+                                    {{ $product->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="source" class="form-label">Source</label>
+                        <select class="form-select" id="source" name="source">
+                            <option value="">All Sources</option>
+                            <option value="Website purchase" {{ request('source') == 'Website purchase' ? 'selected' : '' }}>Website purchase</option>
+                            <option value="R or R" {{ request('source') == 'R or R' ? 'selected' : '' }}>R or R</option>
+                            <option value="Messaging" {{ request('source') == 'Messaging' ? 'selected' : '' }}>Messaging</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
                         <label for="search" class="form-label">Search</label>
                         <input type="text" class="form-control" id="search" name="search"
                                placeholder="Search by name, phone, product..." value="{{ request('search') }}">
                     </div>
 
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="ti ti-search me-1"></i> Filter
-                        </button>
-                        <a href="{{ route('orders.overdue') }}" class="btn btn-secondary">
-                            <i class="ti ti-x me-1"></i> Clear
-                        </a>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="ti ti-search me-1"></i> Filter
+                            </button>
+                            <a href="{{ route('orders.overdue') }}" class="btn btn-secondary flex-fill">
+                                <i class="ti ti-x me-1"></i> Clear
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -109,7 +134,9 @@
                                                 'not_picking_calls' => 'bg-danger',
                                                 'number_off' => 'bg-secondary',
                                                 'call_back' => 'bg-info',
-                                                'cancelled' => 'bg-dark'
+                                                'cancelled' => 'bg-dark',
+                                                'failed' => 'bg-danger',
+                                                'paid' => 'bg-success'
                                             ];
                                             $statusColor = $statusColors[$order->status] ?? 'bg-secondary';
                                             $statusDisplay = ucwords(str_replace('_', ' ', $order->status));

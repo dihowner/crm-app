@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\Customer;
 use App\Models\User;
+use App\Models\Inventory;
+use App\Models\Agent;
+use App\Models\Product;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -77,13 +80,55 @@ class DashboardController extends Controller
                 ->count();
         }
 
+        // Logistic Manager specific metrics
+        $logisticMetrics = [];
+        if ($user->isLogisticManager()) {
+            // Inventory stats
+            $totalInventoryItems = Inventory::count();
+            $lowStockItems = Inventory::whereRaw('quantity <= low_stock_threshold')->count();
+            $outOfStockItems = Inventory::where('quantity', 0)->count();
+            
+            // Calculate total stock value (using product price or inventory selling price)
+            $totalStockValue = Inventory::join('products', 'inventory.product_id', '=', 'products.id')
+                ->selectRaw('SUM(inventory.quantity * COALESCE(inventory.selling_price, products.price, 0)) as total_value')
+                ->value('total_value') ?? 0;
+
+            // Delivery stats
+            $deliveredToday = Order::where('status', 'delivered')
+                ->whereDate('updated_at', today())
+                ->count();
+            $deliveredThisWeek = Order::where('status', 'delivered')
+                ->whereBetween('updated_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])
+                ->count();
+            $ordersWithAgents = Order::whereNotNull('agent_id')->count();
+            $paidOrders = Order::where('status', 'paid')->count();
+
+            // Agent stats
+            $activeAgents = Agent::where('status', 'active')->count();
+            $agentsWithOrders = Agent::whereHas('orders')->where('status', 'active')->count();
+
+            $logisticMetrics = [
+                'total_inventory_items' => $totalInventoryItems,
+                'low_stock_items' => $lowStockItems,
+                'out_of_stock_items' => $outOfStockItems,
+                'total_stock_value' => $totalStockValue,
+                'delivered_today' => $deliveredToday,
+                'delivered_this_week' => $deliveredThisWeek,
+                'orders_with_agents' => $ordersWithAgents,
+                'paid_orders' => $paidOrders,
+                'active_agents' => $activeAgents,
+                'agents_with_orders' => $agentsWithOrders,
+            ];
+        }
+
         return view('dashboard.index', compact(
             'user',
             'metrics',
             'recentOrders',
             'unassignedOrdersCount',
             'myOrdersCount',
-            'myTodayOrdersCount'
+            'myTodayOrdersCount',
+            'logisticMetrics'
         ));
     }
 }

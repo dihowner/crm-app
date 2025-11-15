@@ -95,8 +95,8 @@
                     </div>
                     <div class="col-6">
                         <div class="text-center">
-                            <h2 class="text-primary mb-1">₦{{ number_format($avgOrderValue, 2) }}</h2>
-                            <p class="text-muted mb-0">Avg Order Value</p>
+                            <h2 class="text-primary mb-1">₦{{ number_format($todayRevenue, 2) }}</h2>
+                            <p class="text-muted mb-0">Today's Revenue</p>
                         </div>
                     </div>
                 </div>
@@ -128,22 +128,6 @@
                             <p class="text-muted mb-0">Returning Customers</p>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Revenue by Product Chart -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header border-bottom border-dashed">
-                <h4 class="card-title">Revenue by Product</h4>
-            </div>
-            <div class="card-body">
-                <div class="chart-container" style="height: 400px;">
-                    <canvas id="revenueChart"></canvas>
                 </div>
             </div>
         </div>
@@ -208,76 +192,4 @@
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Load chart data
-    loadRevenueChart();
-});
-
-function loadRevenueChart() {
-    fetch('{{ route("stats.chart-data") }}?filter={{ $filter }}')
-        .then(response => response.json())
-        .then(data => {
-            createRevenueChart(data.revenue_by_product);
-        })
-        .catch(error => {
-            console.error('Error loading chart data:', error);
-        });
-}
-
-function createRevenueChart(data) {
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-
-    const labels = data.map(item => item.name);
-    const revenues = data.map(item => item.revenue);
-
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Revenue (₦)',
-                data: revenues,
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '₦' + value.toLocaleString();
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        maxRotation: 45,
-                        minRotation: 45
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Revenue: ₦' + context.parsed.y.toLocaleString();
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-</script>
 @endsection

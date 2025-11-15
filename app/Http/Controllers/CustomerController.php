@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\SmsRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -133,7 +134,7 @@ class CustomerController extends Controller
 
             if ($smsResult['success']) {
                 $sentCount++;
-                $totalCost += $smsResult['cost'];
+                $totalCost += $smsResult['cost'] ?? 0;
             } else {
                 $failedCount++;
                 \Log::error("SMS failed for customer {$customer->id}: {$smsResult['error']}");
@@ -166,7 +167,15 @@ class CustomerController extends Controller
             $query->where('state', $request->location);
         }
 
-        $customers = $query->select('id', 'name', 'phone')->get();
+        // Get unique customers by name+phone (same logic as SMS marketing)
+        $customers = $query->select('customers.id', 'customers.name', 'customers.phone')
+            ->join(DB::raw('(SELECT name, phone, MIN(id) as min_id FROM customers GROUP BY name, phone) as unique_customers'), function($join) {
+                $join->on('customers.name', '=', 'unique_customers.name')
+                     ->on('customers.phone', '=', 'unique_customers.phone')
+                     ->on('customers.id', '=', 'unique_customers.min_id');
+            })
+            ->distinct()
+            ->get();
 
         return response()->json($customers);
     }

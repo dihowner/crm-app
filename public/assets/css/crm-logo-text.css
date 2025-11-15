@@ -1,21 +1,22 @@
-/* CRM Logo Text Styling */
+/* AfroWellness Logo Text Styling */
 
 .logo h2,
 .logo h4 {
     font-family: 'Inter', sans-serif !important;
     font-weight: 700 !important;
-    text-transform: uppercase !important;
     letter-spacing: 2px !important;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
     transition: all 0.3s ease !important;
 }
 
 .logo h2 {
-    font-size: 2rem !important; /* Large logo text */
+    font-size: 1.5rem !important; /* Large logo text */
+    line-height: 1.2 !important;
 }
 
 .logo h4 {
-    font-size: 1.5rem !important; /* Small logo text */
+    font-size: 1rem !important; /* Small logo text */
+    line-height: 1.2 !important;
 }
 
 /* Hover effect for logo */

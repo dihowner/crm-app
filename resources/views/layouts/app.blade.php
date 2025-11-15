@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>@yield('title', 'CRM Dashboard') - CRM App</title>
+    <title>@yield('title', 'Dashboard') - {{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="A secure e-commerce CRM system for managing orders, customers, and inventory." name="description" />
-    <meta content="CRM App" name="author" />
+    <meta content="A secure e-commerce system for managing orders, customers, and inventory." name="description" />
+    <meta content="{{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}" name="author" />
 
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">

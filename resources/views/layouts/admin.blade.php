@@ -3,10 +3,11 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>@yield('title', 'Super Admin Panel') - CRM App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Super Admin Panel for CRM App" name="description" />
-    <meta content="CRM App" name="author" />
+    <title>@yield('title', 'Super Admin Panel') - {{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta content="Super Admin Panel for {{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}" name="description" />
+    <meta content="{{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}" name="author" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
@@ -40,7 +41,7 @@
     <link href="{{ asset('assets/css/font-improvements.css') }}" rel="stylesheet" type="text/css" />
     <!-- Status Badge Colors -->
     <link href="{{ asset('assets/css/status-badges.css') }}" rel="stylesheet" type="text/css" />
-    <!-- CRM Logo Text Styling -->
+    <!-- {{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }} Logo Text Styling -->
     <link href="{{ asset('assets/css/crm-logo-text.css') }}" rel="stylesheet" type="text/css" />
     <!-- Mobile Navigation -->
     <link href="{{ asset('assets/css/mobile-nav.css') }}" rel="stylesheet" type="text/css" />
@@ -63,19 +64,19 @@
             <a href="{{ route('admin.dashboard') }}" class="logo">
                 <span class="logo-light">
                     <span class="logo-lg">
-                        <h2 class="text-white mb-0 fw-bold">CRM</h2>
+                        <h2 class="text-white mb-0 fw-bold">{{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}</h2>
                     </span>
                     <span class="logo-sm">
-                        <h4 class="text-white mb-0 fw-bold">CRM</h4>
+                        <h4 class="text-white mb-0 fw-bold">{{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}</h4>
                     </span>
                 </span>
 
                 <span class="logo-dark">
                     <span class="logo-lg">
-                        <h2 class="text-white mb-0 fw-bold">CRM</h2>
+                        <h2 class="text-white mb-0 fw-bold">{{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}</h2>
                     </span>
                     <span class="logo-sm">
-                        <h4 class="text-white mb-0 fw-bold">CRM</h4>
+                        <h4 class="text-white mb-0 fw-bold">{{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}</h4>
                     </span>
                 </span>
             </a>
@@ -205,7 +206,20 @@
                             <div class="page-title-box">
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">
+                                            @php
+                                                $user = auth()->user();
+                                                if ($user->isAdmin()) {
+                                                    echo 'ADMIN Dashboard';
+                                                } elseif ($user->isCSR()) {
+                                                    echo 'CSR Dashboard';
+                                                } elseif ($user->isLogisticManager()) {
+                                                    echo 'Logistic Manager Dashboard';
+                                                } else {
+                                                    echo 'Dashboard';
+                                                }
+                                            @endphp
+                                        </a></li>
                                         @yield('breadcrumbs')
                                     </ol>
                                 </div>
@@ -219,7 +233,7 @@
                         <button class="sidenav-toggle-button btn-icon rounded-circle btn btn-light" type="button">
                             <i class="ti ti-menu-2 fs-22"></i>
                         </button>
-                        <h4 class="mobile-title">CRM</h4>
+                        <h4 class="mobile-title">{{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}</h4>
                     </div>
                     <!-- end page title -->
 
@@ -234,7 +248,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-6">
-                            <script>document.write(new Date().getFullYear())</script> © CRM App
+                            <script>document.write(new Date().getFullYear())</script> © {{ App\Models\AppSetting::getValue('app_name', 'AfroWellness') }}
                         </div>
                         <div class="col-md-6">
                             <div class="text-md-end footer-links d-none d-md-block">

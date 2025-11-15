@@ -117,6 +117,15 @@ class StaffPerformanceController extends Controller
                 }
             }
         ], 'total_price')
+        ->withSum([
+            'orders as delivered_units' => function ($query) use ($productId, $dateRange) {
+                $query->where('status', 'delivered')
+                      ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+                if ($productId) {
+                    $query->where('product_id', $productId);
+                }
+            }
+        ], 'quantity')
         ->whereHas('orders', function ($query) use ($productId, $dateRange) {
             $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
             if ($productId) {
@@ -128,14 +137,21 @@ class StaffPerformanceController extends Controller
             $query->where('id', $staffId);
         }
 
+        $commissionPerOrder = 6000;
+        
         return $query->orderBy('delivered_orders_count', 'desc')
                     ->orderBy('total_revenue', 'desc')
                     ->limit($limit)
                     ->get()
-                    ->map(function ($user, $index) {
+                    ->map(function ($user, $index) use ($commissionPerOrder) {
                         $deliveryRate = $user->total_orders_count > 0
                             ? ($user->delivered_orders_count / $user->total_orders_count) * 100
                             : 0;
+                        
+                        // Calculate revenue after commission: total_price - (delivered_orders * commission)
+                        $revenueRaw = $user->total_revenue ?? 0;
+                        $deliveredCount = $user->delivered_orders_count ?? 0;
+                        $totalRevenue = $revenueRaw - ($deliveredCount * $commissionPerOrder);
 
                         return [
                             'rank' => $index + 1,
@@ -143,8 +159,9 @@ class StaffPerformanceController extends Controller
                             'name' => $user->name,
                             'email' => $user->email,
                             'delivered_orders' => $user->delivered_orders_count,
+                            'delivered_units' => $user->delivered_units ?? 0,
                             'total_orders' => $user->total_orders_count,
-                            'total_revenue' => $user->total_revenue ?? 0,
+                            'total_revenue' => $totalRevenue,
                             'delivery_rate' => round($deliveryRate, 2)
                         ];
                     });
@@ -164,7 +181,10 @@ class StaffPerformanceController extends Controller
         $orders = $query->get();
 
         $deliveredOrders = $orders->where('status', 'delivered');
-        $totalRevenue = $deliveredOrders->sum('total_price');
+        $commissionPerOrder = 6000;
+        $revenueRaw = $deliveredOrders->sum('total_price');
+        $deliveredCount = $deliveredOrders->count();
+        $totalRevenue = $revenueRaw - ($deliveredCount * $commissionPerOrder);
         $deliveryRate = $orders->count() > 0 ? ($deliveredOrders->count() / $orders->count()) * 100 : 0;
 
         // Get performance by status
@@ -175,13 +195,18 @@ class StaffPerformanceController extends Controller
         // Get performance by product (if no specific product selected)
         $productBreakdown = [];
         if (!$productId) {
-            $productBreakdown = $orders->groupBy('product_id')->map(function ($productOrders, $productId) {
+            $productBreakdown = $orders->groupBy('product_id')->map(function ($productOrders, $productId) use ($commissionPerOrder) {
                 $product = Product::find($productId);
+                $deliveredProductOrders = $productOrders->where('status', 'delivered');
+                $productRevenueRaw = $deliveredProductOrders->sum('total_price');
+                $productDeliveredCount = $deliveredProductOrders->count();
+                $productRevenue = $productRevenueRaw - ($productDeliveredCount * $commissionPerOrder);
+                
                 return [
                     'product_name' => $product ? $product->name : 'Unknown',
                     'orders_count' => $productOrders->count(),
-                    'delivered_count' => $productOrders->where('status', 'delivered')->count(),
-                    'revenue' => $productOrders->where('status', 'delivered')->sum('total_price')
+                    'delivered_count' => $productDeliveredCount,
+                    'revenue' => $productRevenue
                 ];
             });
         }

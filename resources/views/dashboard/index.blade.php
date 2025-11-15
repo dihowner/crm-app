@@ -21,29 +21,206 @@
 
     @if($user->isLogisticManager())
         <!-- Logistic Manager Dashboard -->
-        <div class="row">
+        
+        <!-- Welcome Header -->
+        <div class="row mb-4">
             <div class="col-12">
-                <div class="text-center py-5">
-                    <h1 class="text-primary mb-3">Welcome, {{ $user->name }}!</h1>
-                    <p class="text-muted fs-16 mb-4">You have access to manage inventory and delivery operations.</p>
+                <div class="text-center">
+                    <h1 class="text-primary mb-2">Welcome, {{ $user->name }}!</h1>
+                    <p class="text-muted fs-16">Manage inventory and delivery operations</p>
                 </div>
+            </div>
+        </div>
 
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="alert alert-info border-0">
-                            <div class="d-flex align-items-center">
-                                <i class="ti ti-info-circle me-3 fs-20"></i>
-                                <div>
-                                    <h6 class="alert-heading mb-1">Logistic Manager Access</h6>
-                                    <p class="mb-0">You can manage inventory levels, track stock movements, and oversee delivery operations from the navigation menu.</p>
+        <!-- Inventory Stats Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm rounded bg-primary-subtle">
+                                    <span class="avatar-title rounded bg-primary text-white font-size-18">
+                                        <i class="ti ti-package"></i>
+                                    </span>
                                 </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-uppercase fw-medium text-muted mb-0">Total Items</p>
+                                <h4 class="mb-0">{{ $logisticMetrics['total_inventory_items'] ?? 0 }}</h4>
+                                <p class="text-muted mb-0">In Inventory</p>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm rounded bg-warning-subtle">
+                                    <span class="avatar-title rounded bg-warning text-white font-size-18">
+                                        <i class="ti ti-alert-triangle"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-uppercase fw-medium text-muted mb-0">Low Stock</p>
+                                <h4 class="mb-0">{{ $logisticMetrics['low_stock_items'] ?? 0 }}</h4>
+                                <p class="text-muted mb-0">Items Need Restock</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm rounded bg-danger-subtle">
+                                    <span class="avatar-title rounded bg-danger text-white font-size-18">
+                                        <i class="ti ti-x"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-uppercase fw-medium text-muted mb-0">Out of Stock</p>
+                                <h4 class="mb-0">{{ $logisticMetrics['out_of_stock_items'] ?? 0 }}</h4>
+                                <p class="text-muted mb-0">Items Unavailable</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm rounded bg-success-subtle">
+                                    <span class="avatar-title rounded bg-success text-white font-size-18">
+                                        <i class="ti ti-currency-naira"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-uppercase fw-medium text-muted mb-0">Stock Value</p>
+                                <h4 class="mb-0">₦{{ number_format($logisticMetrics['total_stock_value'] ?? 0, 2) }}</h4>
+                                <p class="text-muted mb-0">Total Inventory</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- Delivery & Order Stats Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm rounded bg-success-subtle">
+                                    <span class="avatar-title rounded bg-success text-white font-size-18">
+                                        <i class="ti ti-truck"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-uppercase fw-medium text-muted mb-0">Delivered Today</p>
+                                <h4 class="mb-0">{{ $logisticMetrics['delivered_today'] ?? 0 }}</h4>
+                                <p class="text-muted mb-0">Orders Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm rounded bg-info-subtle">
+                                    <span class="avatar-title rounded bg-info text-white font-size-18">
+                                        <i class="ti ti-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-uppercase fw-medium text-muted mb-0">Delivered This Week</p>
+                                <h4 class="mb-0">{{ $logisticMetrics['delivered_this_week'] ?? 0 }}</h4>
+                                <p class="text-muted mb-0">Weekly Total</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm rounded bg-primary-subtle">
+                                    <span class="avatar-title rounded bg-primary text-white font-size-18">
+                                        <i class="ti ti-check"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-uppercase fw-medium text-muted mb-0">Paid Orders</p>
+                                <h4 class="mb-0">{{ $logisticMetrics['paid_orders'] ?? 0 }}</h4>
+                                <p class="text-muted mb-0">Payment Received</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm rounded bg-secondary-subtle">
+                                    <span class="avatar-title rounded bg-secondary text-white font-size-18">
+                                        <i class="ti ti-users"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="text-uppercase fw-medium text-muted mb-0">Active Agents</p>
+                                <h4 class="mb-0">{{ $logisticMetrics['active_agents'] ?? 0 }}</h4>
+                                <p class="text-muted mb-0">{{ $logisticMetrics['agents_with_orders'] ?? 0 }} with Orders</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-info border-0">
+                    <div class="d-flex align-items-center">
+                        <i class="ti ti-info-circle me-3 fs-20"></i>
+                        <div>
+                            <h6 class="alert-heading mb-1">Quick Access</h6>
+                            <p class="mb-0">Manage inventory levels, track stock movements, view payment records, and oversee delivery operations from the navigation menu.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     @else
         <!-- Admin and CSR Dashboard -->
 
@@ -257,12 +434,18 @@
                                                         'new' => 'bg-primary',
                                                         'scheduled' => 'bg-warning',
                                                         'delivered' => 'bg-success',
+                                                        'not_picking_calls' => 'bg-danger',
                                                         'not picking calls' => 'bg-danger',
+                                                        'number_off' => 'bg-secondary',
                                                         'number off' => 'bg-secondary',
-                                                        'call back' => 'bg-info'
+                        'call_back' => 'bg-info',
+                        'call back' => 'bg-info',
+                        'cancelled' => 'bg-dark',
+                        'failed' => 'bg-danger',
+                        'paid' => 'bg-success'
                                                     ];
                                                     $statusColor = $statusColors[strtolower($order->status)] ?? 'bg-secondary';
-                                                    $statusDisplay = ucfirst($order->status);
+                                                    $statusDisplay = ucwords(str_replace('_', ' ', $order->status));
                                                 @endphp
                                                 <span class="badge {{ $statusColor }} text-white">{{ $statusDisplay }}</span>
                                             </td>

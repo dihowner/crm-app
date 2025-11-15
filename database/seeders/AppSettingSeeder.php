@@ -289,16 +289,6 @@ class AppSettingSeeder extends Seeder
             ],
             [
                 'category' => 'sms',
-                'key' => 'sms_cost_per_message',
-                'label' => 'Cost Per SMS (₦)',
-                'description' => 'Cost per SMS message in your local currency',
-                'value' => '0.50',
-                'type' => 'number',
-                'is_required' => false,
-                'sort_order' => 5,
-            ],
-            [
-                'category' => 'sms',
                 'key' => 'sms_api_url',
                 'label' => 'SMS API URL',
                 'description' => 'API endpoint URL (for custom providers)',

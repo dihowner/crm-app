@@ -14,19 +14,15 @@ class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        // Logistic Managers can only access inventory pages
-        if (Auth::user()->isLogisticManager()) {
-            abort(403, 'Access denied. Logistic Managers can only access inventory management.');
-        }
-
-        // Start with orders that have agents (delivered orders)
+        // Show delivered and paid orders on payment records page
         $query = Order::with(['customer', 'product', 'assignedUser', 'agent', 'paymentRecords'])
-                     ->whereNotNull('agent_id');
+                     ->whereIn('status', ['delivered', 'paid']);
 
         // Role-based filtering
         if (Auth::user()->isCSR()) {
             $query->where('assigned_to', Auth::id());
         }
+        // Logistic Managers and Admins see all orders
 
         // Date filter
         if ($request->filled('start_date') && $request->filled('end_date')) {
@@ -93,10 +89,15 @@ class PaymentController extends Controller
             'notes' => 'nullable|string|max:500'
         ]);
 
+        // Only Logistic Managers can add payment records
+        if (Auth::user()->isAdmin() || Auth::user()->isCSR()) {
+            return response()->json(['error' => 'You do not have permission to add payment records.'], 403);
+        }
+
         // Check if user can add payment for this order
         $order = Order::findOrFail($request->order_id);
-        if (Auth::user()->isCSR() && (string)$order->assigned_to !== (string)Auth::id()) {
-            return response()->json(['error' => 'You can only add payments for orders assigned to you.'], 403);
+        if (!$order || $order->status !== 'delivered') {
+            return response()->json(['error' => 'Payment records can only be added to delivered orders.'], 403);
         }
 
         try {
@@ -111,7 +112,24 @@ class PaymentController extends Controller
                 'recorded_by' => Auth::id()
             ]);
 
+            // Update order status to 'paid' when payment is added
+            $order->update([
+                'status' => 'paid'
+            ]);
+
             DB::commit();
+
+            // Send payment confirmation email to customer
+            try {
+                $emailService = new \App\Services\EmailService();
+                $emailService->sendPaymentConfirmation(
+                    $order->fresh(['customer', 'product']),
+                    $paymentRecord->fresh()
+                );
+            } catch (\Exception $e) {
+                // Log error but don't fail the payment record creation
+                \Log::error('Failed to send payment confirmation email: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'success' => true,

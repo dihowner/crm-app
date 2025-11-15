@@ -149,6 +149,8 @@
         .status-scheduled { background-color: #fff3cd; color: #997404; }
         .status-delivered { background-color: #d1e7dd; color: #0f5132; }
         .status-cancelled { background-color: #f8d7da; color: #842029; }
+        .status-failed { background-color: #f8d7da; color: #842029; }
+        .status-paid { background-color: #d1e7dd; color: #0f5132; }
         @media print {
             body { background-color: white; }
             .invoice-container { box-shadow: none; }

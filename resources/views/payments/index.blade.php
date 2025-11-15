@@ -152,24 +152,32 @@
                                         <td>{{ $order->agent->name ?? 'No Agent' }}</td>
                                         <td>{{ $order->created_at->format('M d, Y H:i') }}</td>
                                         <td>
-                                            @if($order->paymentRecords->count() > 0)
-                                                <div class="payment-info">
-                                                    @foreach($order->paymentRecords as $payment)
-                                                        <div class="mb-1">
-                                                            <span class="text-success fw-bold">₦{{ number_format($payment->amount, 2) }}</span>
-                                                            <small class="text-muted">on {{ $payment->payment_date->format('M d, Y') }}</small>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <button type="button" class="btn btn-outline-primary btn-sm"
-                                                        onclick="openPaymentModal({{ $order->id }}, '{{ $order->customer->name }}', '{{ $order->product->name }}')">
-                                                    Add Payment Record
-                                                </button>
-                                            @endif
-                                            <a href="{{ route('orders.show', $order) }}" class="btn btn-outline-secondary btn-sm ms-1" target="_blank">
-                                                View
-                                            </a>
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if($order->paymentRecords->count() > 0)
+                                                    <div class="payment-info">
+                                                        @foreach($order->paymentRecords as $payment)
+                                                            <div class="mb-1">
+                                                                <span class="text-success fw-bold">₦{{ number_format($payment->amount, 2) }}</span>
+                                                                <small class="text-muted">on {{ $payment->payment_date->format('M d, Y') }}</small>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    @if(auth()->user()->isCSR())
+                                                        <span class="text-muted">Not Paid</span>
+                                                    @elseif(auth()->user()->isLogisticManager())
+                                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                                onclick="openPaymentModal({{ $order->id }}, '{{ $order->customer->name }}', '{{ $order->product->name }}')">
+                                                            Add Payment Record
+                                                        </button>
+                                                    @endif
+                                                @endif
+                                                @if(auth()->user()->isAdmin())
+                                                    <a href="{{ route('orders.show', $order) }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                                        View
+                                                    </a>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach

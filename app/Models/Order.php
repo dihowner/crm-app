@@ -15,6 +15,7 @@ class Order extends Model
         'assigned_to',
         'assigned_at',
         'agent_id',
+        'source',
         'quantity',
         'unit_price',
         'total_price',

@@ -12,18 +12,31 @@ class SmsService
     protected $apiKey;
     protected $apiSecret;
     protected $senderId;
-    protected $costPerMessage;
     protected $apiUrl;
 
     public function __construct()
     {
-        $this->provider = AppSetting::getValue('sms_provider', 'none');
+        // Get SMS configuration from app_settings
+        $smsConfig = json_decode(AppSetting::getValue('sms_config', '{"api_url":"http://sms.paynex.org/api/sendsms.php","auth_token":"","sender_id":"PEAKSYSTEMS","product_id":"dndroute"}'), true);
+
+        // Legacy settings (for backward compatibility)
         $this->apiKey = AppSetting::getValue('sms_api_key', '');
         $this->apiSecret = AppSetting::getValue('sms_api_secret', '');
-        $this->senderId = AppSetting::getValue('sms_sender_id', '');
-        $this->costPerMessage = (float) AppSetting::getValue('sms_cost_per_message', '0.50');
-        $this->apiUrl = AppSetting::getValue('sms_api_url', '');
+        $this->senderId = $smsConfig['sender_id'] ?? AppSetting::getValue('sms_sender_id', 'PEAKSYSTEMS');
+        $this->apiUrl = $smsConfig['api_url'] ?? AppSetting::getValue('sms_api_url', 'http://sms.paynex.org/api/sendsms.php');
+        $this->authToken = $smsConfig['auth_token'] ?? '';
+        $this->productId = $smsConfig['product_id'] ?? 'dndroute';
+
+        // Auto-detect provider: if Paynex config exists and has auth_token, use paynex; otherwise use configured provider or none
+        if (!empty($this->authToken) && !empty($this->apiUrl) && str_contains($this->apiUrl, 'paynex')) {
+            $this->provider = 'paynex';
+        } else {
+            $this->provider = AppSetting::getValue('sms_provider', 'none');
+        }
     }
+
+    protected $authToken;
+    protected $productId;
 
     /**
      * Send SMS to a single recipient
@@ -33,6 +46,8 @@ class SmsService
         $phone = $this->formatPhoneNumber($phone);
 
         switch ($this->provider) {
+            case 'paynex':
+                return $this->sendViaPaynex($phone, $message);
             case 'twilio':
                 return $this->sendViaTwilio($phone, $message);
             case 'nexmo':
@@ -70,7 +85,7 @@ class SmsService
                     'success' => true,
                     'message_id' => $data['sid'] ?? null,
                     'status' => 'sent',
-                    'cost' => $this->costPerMessage,
+                    'cost' => $this->extractCostFromResponse($data),
                     'provider_response' => $data
                 ];
             } else {
@@ -78,16 +93,16 @@ class SmsService
                     'success' => false,
                     'error' => 'Twilio API error: ' . $response->body(),
                     'status' => 'failed',
-                    'cost' => 0
+                    'cost' => null
                 ];
             }
         } catch (\Exception $e) {
             Log::error('Twilio SMS Error: ' . $e->getMessage());
             return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'status' => 'failed',
-                'cost' => 0
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'status' => 'failed',
+                    'cost' => null
             ];
         }
     }
@@ -115,7 +130,7 @@ class SmsService
                         'success' => true,
                         'message_id' => $messageData['message-id'] ?? null,
                         'status' => 'sent',
-                        'cost' => $this->costPerMessage,
+                        'cost' => $this->extractCostFromResponse($data),
                         'provider_response' => $data
                     ];
                 } else {
@@ -123,7 +138,7 @@ class SmsService
                         'success' => false,
                         'error' => 'Nexmo error: ' . ($messageData['error-text'] ?? 'Unknown error'),
                         'status' => 'failed',
-                        'cost' => 0
+                        'cost' => null
                     ];
                 }
             } else {
@@ -131,16 +146,16 @@ class SmsService
                     'success' => false,
                     'error' => 'Nexmo API error: ' . $response->body(),
                     'status' => 'failed',
-                    'cost' => 0
+                    'cost' => null
                 ];
             }
         } catch (\Exception $e) {
             Log::error('Nexmo SMS Error: ' . $e->getMessage());
             return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'status' => 'failed',
-                'cost' => 0
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'status' => 'failed',
+                    'cost' => null
             ];
         }
     }
@@ -166,7 +181,7 @@ class SmsService
                     'success' => true,
                     'message_id' => $data['SMSMessageData']['Recipients'][0]['messageId'] ?? null,
                     'status' => 'sent',
-                    'cost' => $this->costPerMessage,
+                    'cost' => $this->extractCostFromResponse($data),
                     'provider_response' => $data
                 ];
             } else {
@@ -174,16 +189,16 @@ class SmsService
                     'success' => false,
                     'error' => 'Africa\'s Talking API error: ' . $response->body(),
                     'status' => 'failed',
-                    'cost' => 0
+                    'cost' => null
                 ];
             }
         } catch (\Exception $e) {
             Log::error('Africa\'s Talking SMS Error: ' . $e->getMessage());
             return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'status' => 'failed',
-                'cost' => 0
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'status' => 'failed',
+                    'cost' => null
             ];
         }
     }
@@ -209,7 +224,7 @@ class SmsService
                         'success' => true,
                         'message_id' => $data['batch_id'] ?? null,
                         'status' => 'sent',
-                        'cost' => $this->costPerMessage,
+                        'cost' => $this->extractCostFromResponse($data),
                         'provider_response' => $data
                     ];
                 } else {
@@ -217,7 +232,7 @@ class SmsService
                         'success' => false,
                         'error' => 'TextLocal error: ' . ($data['errors'][0]['message'] ?? 'Unknown error'),
                         'status' => 'failed',
-                        'cost' => 0
+                        'cost' => null
                     ];
                 }
             } else {
@@ -225,16 +240,16 @@ class SmsService
                     'success' => false,
                     'error' => 'TextLocal API error: ' . $response->body(),
                     'status' => 'failed',
-                    'cost' => 0
+                    'cost' => null
                 ];
             }
         } catch (\Exception $e) {
             Log::error('TextLocal SMS Error: ' . $e->getMessage());
             return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'status' => 'failed',
-                'cost' => 0
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'status' => 'failed',
+                    'cost' => null
             ];
         }
     }
@@ -260,7 +275,7 @@ class SmsService
                         'success' => true,
                         'message_id' => $data['message_id'] ?? null,
                         'status' => 'sent',
-                        'cost' => $this->costPerMessage,
+                        'cost' => $this->extractCostFromResponse($data),
                         'provider_response' => $data
                     ];
                 } else {
@@ -268,7 +283,7 @@ class SmsService
                         'success' => false,
                         'error' => 'SmartSMS error: ' . ($data['message'] ?? 'Unknown error'),
                         'status' => 'failed',
-                        'cost' => 0
+                        'cost' => null
                     ];
                 }
             } else {
@@ -276,16 +291,100 @@ class SmsService
                     'success' => false,
                     'error' => 'SmartSMS API error: ' . $response->body(),
                     'status' => 'failed',
-                    'cost' => 0
+                    'cost' => null
                 ];
             }
         } catch (\Exception $e) {
             Log::error('SmartSMS Error: ' . $e->getMessage());
             return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'status' => 'failed',
-                'cost' => 0
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'status' => 'failed',
+                    'cost' => null
+            ];
+        }
+    }
+
+    /**
+     * Send SMS via Paynex API
+     */
+    protected function sendViaPaynex(string $phone, string $message): array
+    {
+        try {
+            // Format phone number - remove + and country code prefix if present
+            $recipient = preg_replace('/^\+234/', '0', $phone); // Convert +234 to 0
+            $recipient = ltrim($recipient, '+'); // Remove any remaining +
+
+            // Validate auth token is set
+            if (empty($this->authToken)) {
+                return [
+                    'success' => false,
+                    'error' => 'SMS Authorization token is not configured. Please configure it in App Settings.',
+                    'status' => 'failed',
+                    'cost' => null
+                ];
+            }
+
+            $response = Http::withHeaders([
+                'Authorization' => $this->authToken,
+                'Content-Type' => 'application/json',
+            ])->post($this->apiUrl, [
+                'senderid' => $this->senderId,
+                'recipient' => $recipient,
+                'message' => $message,
+                'product_id' => $this->productId,
+            ]);
+
+            // Check HTTP status and response body
+            $responseBody = $response->body();
+            $data = $response->json();
+
+            Log::info('Paynex SMS API Response', [
+                'status_code' => $response->status(),
+                'response_body' => $responseBody,
+                'recipient' => $recipient
+            ]);
+
+            if ($response->successful()) {
+                // Paynex API response structure
+                $apiSuccess = $data['status'] ?? $data['success'] ?? false;
+
+                // Check if status is explicitly true (Paynex uses boolean true/false)
+                if ($apiSuccess === true || $apiSuccess === 'true' || (is_string($data['message'] ?? '') && str_contains(strtolower($data['message']), 'success'))) {
+                    return [
+                        'success' => true,
+                        'message_id' => $data['message_id'] ?? $data['id'] ?? $data['sms_id'] ?? $data['batch_id'] ?? null,
+                        'status' => 'sent',
+                        'cost' => $this->extractCostFromResponse($data), // Will extract from 'amount' field
+                        'provider_response' => $data
+                    ];
+                } else {
+                    // API returned 200 but with error in response
+                    $errorMessage = $data['message'] ?? $data['error'] ?? 'Unknown error';
+                    return [
+                        'success' => false,
+                        'error' => 'Paynex API error: ' . $errorMessage,
+                        'status' => 'failed',
+                        'cost' => null,
+                        'provider_response' => $data
+                    ];
+                }
+            } else {
+                return [
+                    'success' => false,
+                    'error' => 'Paynex API error (HTTP ' . $response->status() . '): ' . $responseBody,
+                    'status' => 'failed',
+                    'cost' => null,
+                    'provider_response' => $data ?? []
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('Paynex SMS Error: ' . $e->getMessage());
+            return [
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'status' => 'failed',
+                    'cost' => null
             ];
         }
     }
@@ -310,7 +409,7 @@ class SmsService
                     'success' => true,
                     'message_id' => $data['message_id'] ?? $data['id'] ?? null,
                     'status' => 'sent',
-                    'cost' => $this->costPerMessage,
+                    'cost' => $this->extractCostFromResponse($data),
                     'provider_response' => $data
                 ];
             } else {
@@ -318,16 +417,16 @@ class SmsService
                     'success' => false,
                     'error' => 'Custom provider API error: ' . $response->body(),
                     'status' => 'failed',
-                    'cost' => 0
+                    'cost' => null
                 ];
             }
         } catch (\Exception $e) {
             Log::error('Custom SMS Provider Error: ' . $e->getMessage());
             return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'status' => 'failed',
-                'cost' => 0
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'status' => 'failed',
+                    'cost' => null
             ];
         }
     }
@@ -349,6 +448,40 @@ class SmsService
                 'message' => 'SMS sent in test mode - no actual SMS was sent'
             ]
         ];
+    }
+
+    /**
+     * Extract cost from API response
+     * Tries common cost field names from various SMS providers
+     */
+    protected function extractCostFromResponse(array $data): ?float
+    {
+        // Try common cost field names
+        $costFields = ['cost', 'price', 'amount', 'charge', 'credit', 'credits', 'balance_used', 'balance_deducted'];
+
+        foreach ($costFields as $field) {
+            if (isset($data[$field])) {
+                $cost = (float) $data[$field];
+                if ($cost > 0) {
+                    return $cost;
+                }
+            }
+        }
+
+        // Try nested structures (e.g., data.message.cost)
+        if (isset($data['message']) && is_array($data['message'])) {
+            foreach ($costFields as $field) {
+                if (isset($data['message'][$field])) {
+                    $cost = (float) $data['message'][$field];
+                    if ($cost > 0) {
+                        return $cost;
+                    }
+                }
+            }
+        }
+
+        // If no cost found, return null (not 0, as 0 might indicate actual cost)
+        return null;
     }
 
     /**

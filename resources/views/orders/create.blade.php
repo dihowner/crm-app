@@ -25,21 +25,28 @@
 
                     <!-- Row 1: Customer Name, Phone, WhatsApp -->
                     <div class="row">
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="customer_name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="customer_name" name="customer_name"
                                        value="{{ old('customer_name') }}" required>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="customer_phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
                                 <input type="tel" class="form-control" id="customer_phone" name="customer_phone"
                                        value="{{ old('customer_phone') }}" required>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="customer_email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="customer_email" name="customer_email"
+                                       value="{{ old('customer_email') }}">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="customer_whatsapp" class="form-label">WhatsApp Number</label>
                                 <input type="tel" class="form-control" id="customer_whatsapp" name="customer_whatsapp"
@@ -117,9 +124,9 @@
                         </div>
                     </div>
 
-                    <!-- Row 3: Price, Status, Agent -->
+                    <!-- Row 3: Price, Status, Agent, Source -->
                     <div class="row">
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="unit_price" class="form-label">Price <span class="text-danger">*</span></label>
                                 <div class="input-group">
@@ -129,7 +136,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="order_status" class="form-label">Status <span class="text-danger">*</span></label>
                                 <select class="form-select" id="order_status" name="status" required>
@@ -142,7 +149,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="agent_id" class="form-label">Agent</label>
                                 <select class="form-select" id="agent_id" name="agent_id">
@@ -152,6 +159,17 @@
                                             {{ $agent->name }}
                                         </option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="source" class="form-label">Source</label>
+                                <select class="form-select" id="source" name="source">
+                                    <option value="">Select Source</option>
+                                    <option value="Website purchase" {{ old('source') == 'Website purchase' ? 'selected' : '' }}>Website purchase</option>
+                                    <option value="R or R" {{ old('source') == 'R or R' ? 'selected' : '' }}>R or R</option>
+                                    <option value="Messaging" {{ old('source') == 'Messaging' ? 'selected' : '' }}>Messaging</option>
                                 </select>
                             </div>
                         </div>

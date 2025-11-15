@@ -4,7 +4,9 @@
 .wrapper {
     position: relative;
     width: 100%;
+    max-width: 100%;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 /* Sidebar positioning */
@@ -30,6 +32,9 @@
 .content-page .container-fluid {
     padding: 20px;
     max-width: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 /* Responsive adjustments */
@@ -62,13 +67,35 @@
 }
 
 /* Tablet adjustments */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1199px) {
     .content-page {
         margin-left: 260px;
     }
 
     .sidenav-menu {
         width: 260px;
+    }
+
+    /* Reduce padding on tablets to prevent overflow */
+    .content-page .container-fluid {
+        padding: 15px;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Ensure cards don't overflow */
+    .card {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Reduce font sizes slightly on tablets */
+    .page-title {
+        font-size: 1.5rem !important;
+    }
+
+    .card-title {
+        font-size: 1rem !important;
     }
 }
 
@@ -108,6 +135,14 @@
 .table-responsive {
     border-radius: 8px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    width: 100%;
+}
+
+/* Prevent body from horizontal scrolling */
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
 }
 
 /* Ensure proper button spacing */

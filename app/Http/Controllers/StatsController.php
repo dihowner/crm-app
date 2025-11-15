@@ -35,13 +35,21 @@ class StatsController extends Controller
         $weekOrders = Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count();
         $monthOrders = Order::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count();
 
-        // Filtered orders for the selected period
-        $filteredOrders = Order::whereBetween('created_at', [$startDate, $endDate]);
-
-        // Revenue calculations
-        $totalRevenue = Order::where('status', 'delivered')->sum('total_price');
-        $filteredRevenue = $filteredOrders->where('status', 'delivered')->sum('total_price');
-        $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
+        // Commission per delivered order
+        $commissionPerOrder = 6000;
+        
+        // Revenue calculations - Revenue = total_price - commission per delivered order
+        $deliveredOrdersCount = Order::where('status', 'delivered')->count();
+        $totalRevenueRaw = Order::where('status', 'delivered')->sum('total_price');
+        $totalRevenue = $totalRevenueRaw - ($deliveredOrdersCount * $commissionPerOrder);
+        
+        // Today's Revenue - revenue from today's delivered orders
+        $todayDeliveredOrders = Order::where('status', 'delivered')
+            ->whereDate('updated_at', today())
+            ->get();
+        $todayRevenueRaw = $todayDeliveredOrders->sum('total_price');
+        $todayDeliveredCount = $todayDeliveredOrders->count();
+        $todayRevenue = $todayRevenueRaw - ($todayDeliveredCount * $commissionPerOrder);
 
         // Fulfillment and failure rates
         $deliveredOrders = Order::where('status', 'delivered')->count();
@@ -50,13 +58,38 @@ class StatsController extends Controller
         $failedDeliveryRate = $totalOrders > 0 ? ($failedOrders / $totalOrders) * 100 : 0;
 
         // Customer Insights
-        $newCustomers = Customer::whereBetween('created_at', [$startDate, $endDate])->count();
-        $returningCustomers = Customer::whereHas('orders', function ($query) use ($startDate, $endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
-        })->where('created_at', '<', $startDate)->count();
-        $chatCustomers = Customer::whereHas('orders', function ($query) {
-            $query->where('status', 'not picking calls');
-        })->count();
+        // Track by duplicate customer records in customers table (same name+phone appearing multiple times)
+        // New Customers: Unique name+phone combinations in orders within filtered period that DON'T have duplicates in customers table
+        $newCustomers = DB::table('orders')
+            ->join('customers', 'orders.customer_id', '=', 'customers.id')
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->whereNotExists(function ($query) {
+                // Check if this name+phone appears multiple times in customers table (duplicate record)
+                $query->select(DB::raw(1))
+                    ->from('customers as other_customers')
+                    ->whereRaw('other_customers.name = customers.name')
+                    ->whereRaw('other_customers.phone = customers.phone')
+                    ->whereColumn('other_customers.id', '!=', 'customers.id'); // Different customer record
+            })
+            ->distinct()
+            ->select('customers.name', 'customers.phone')
+            ->count();
+        
+        // Returning Customers: Customers with duplicate records in customers table (same name+phone appearing multiple times)
+        // Count unique name+phone combinations that have multiple customer records
+        $returningCustomers = DB::table('customers')
+            ->select('name', 'phone', DB::raw('COUNT(*) as count'))
+            ->groupBy('name', 'phone')
+            ->having('count', '>', 1) // Has duplicate records
+            ->count();
+        
+        // Chat Customers: Orders with source = "Messaging"
+        $chatCustomers = DB::table('orders')
+            ->join('customers', 'orders.customer_id', '=', 'customers.id')
+            ->where('orders.source', 'Messaging')
+            ->distinct()
+            ->select('customers.name', 'customers.phone')
+            ->count();
 
         // Product Statistics
         $productStats = $this->getProductStats($startDate, $endDate);
@@ -71,8 +104,7 @@ class StatsController extends Controller
             'weekOrders',
             'monthOrders',
             'totalRevenue',
-            'filteredRevenue',
-            'avgOrderValue',
+            'todayRevenue',
             'fulfillmentRate',
             'failedDeliveryRate',
             'newCustomers',
@@ -115,11 +147,13 @@ class StatsController extends Controller
         ->withCount(['orders as month_orders' => function ($query) {
             $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
         }])
-        ->withCount(['orders as delivered_orders' => function ($query) {
-            $query->where('status', 'delivered');
+        ->withCount(['orders as delivered_orders' => function ($query) use ($startDate, $endDate) {
+            $query->where('status', 'delivered')
+                  ->whereBetween('created_at', [$startDate, $endDate]);
         }])
-        ->withCount(['orders as failed_orders' => function ($query) {
-            $query->where('status', 'failed');
+        ->withCount(['orders as failed_orders' => function ($query) use ($startDate, $endDate) {
+            $query->where('status', 'failed')
+                  ->whereBetween('created_at', [$startDate, $endDate]);
         }])
         ->get();
 
@@ -146,15 +180,27 @@ class StatsController extends Controller
 
     private function getRevenueByProduct($startDate, $endDate)
     {
-        return Product::withSum(['orders' => function ($query) use ($startDate, $endDate) {
+        $commissionPerOrder = 6000;
+        
+        return Product::withCount([
+            'orders as delivered_orders_count' => function ($query) use ($startDate, $endDate) {
+                $query->where('status', 'delivered')
+                      ->whereBetween('created_at', [$startDate, $endDate]);
+            }
+        ])
+        ->withSum(['orders' => function ($query) use ($startDate, $endDate) {
             $query->where('status', 'delivered')
                   ->whereBetween('created_at', [$startDate, $endDate]);
         }], 'total_price')
         ->get()
-        ->map(function ($product) {
+        ->map(function ($product) use ($commissionPerOrder) {
+            $revenueRaw = $product->orders_sum_total_price ?? 0;
+            $deliveredCount = $product->delivered_orders_count ?? 0;
+            $revenue = $revenueRaw - ($deliveredCount * $commissionPerOrder);
+            
             return [
                 'name' => $product->name,
-                'revenue' => $product->orders_sum_total_price ?? 0
+                'revenue' => $revenue
             ];
         })
         ->sortByDesc('revenue')

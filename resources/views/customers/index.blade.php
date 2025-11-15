@@ -31,9 +31,9 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label for="location" class="form-label">Location</label>
+                        <label for="location" class="form-label">State</label>
                         <select class="form-select" id="location" name="location">
-                            <option value="">All Locations</option>
+                            <option value="">All States</option>
                             @foreach($locations as $location)
                                 <option value="{{ $location }}" {{ request('location') == $location ? 'selected' : '' }}>
                                     {{ $location }}
@@ -91,7 +91,7 @@
                             </div>
                             <div class="mb-2">
                                 <select class="form-select form-select-sm" id="bulk_location_filter">
-                                    <option value="">All Locations</option>
+                                    <option value="">All States</option>
                                     @foreach($locations as $location)
                                         <option value="{{ $location }}">{{ $location }}</option>
                                     @endforeach
@@ -120,7 +120,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Phone</th>
-                                <th>Location</th>
+                                <th>State</th>
                                 <th>Orders</th>
                                 <th>Last Order</th>
                                 <th>Actions</th>
@@ -254,19 +254,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!result) {
                         return;
                     }
-                    proceedWithSMS();
+                    proceedWithSMS(message, productId, location);
                 }
             });
             return;
         }
 
-        proceedWithSMS();
-    }
+        proceedWithSMS(message, productId, location);
+    });
 
-    function proceedWithSMS() {
-
+    function proceedWithSMS(message, productId, location) {
         // Get customers based on filters
-        fetch(`{{ route('customers.bulk-sms-data') }}?product_id=${productId}&location=${location}`)
+        fetch(`{{ route('customers.bulk-sms-data') }}?product_id=${productId || ''}&location=${location || ''}`)
             .then(response => response.json())
             .then(customers => {
                 if (customers.length === 0) {
@@ -298,42 +297,84 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (!result) {
                             return;
                         }
-                        sendSMSToCustomers(customers);
+                        sendSMSToCustomers(customers, message);
                     }
                 });
-    }
-
-    function sendSMSToCustomers(customers) {
-        // Submit form with customer IDs
-                const form = document.getElementById('bulkSmsForm');
-                const formData = new FormData(form);
-                formData.append('customer_ids', JSON.stringify(customers.map(c => c.id)));
-
-                fetch('{{ route("customers.bulk-sms") }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.text())
-                .then(() => {
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    bootbox.alert({
-                        message: 'Error sending SMS. Please try again.',
-                        buttons: {
-                            ok: {
-                                label: 'OK',
-                                className: 'btn-primary'
-                            }
+            })
+            .catch(error => {
+                console.error('Error fetching customers:', error);
+                bootbox.alert({
+                    message: 'Error fetching customers. Please try again.',
+                    buttons: {
+                        ok: {
+                            label: 'OK',
+                            className: 'btn-primary'
                         }
-                    });
+                    }
                 });
             });
-    });
+    }
+
+    function sendSMSToCustomers(customers, message) {
+        const form = document.getElementById('bulkSmsForm');
+        const formData = new FormData(form);
+        
+        // Append customer IDs as array (Laravel expects array format)
+        customers.forEach(customer => {
+            formData.append('customer_ids[]', customer.id);
+        });
+
+        // Show loading state
+        const btn = document.getElementById('sendBulkSms');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="ti ti-loader-2 me-1"></i>Sending...';
+        btn.disabled = true;
+
+        fetch('{{ route("customers.bulk-sms") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            }
+            return response.json().then(err => Promise.reject(err));
+        })
+        .then(() => {
+            bootbox.alert({
+                message: 'SMS campaign sent successfully!',
+                buttons: {
+                    ok: {
+                        label: 'OK',
+                        className: 'btn-primary',
+                        callback: function() {
+                            location.reload();
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const errorMessage = error.message || error.error || 'Error sending SMS. Please try again.';
+            bootbox.alert({
+                message: errorMessage,
+                buttons: {
+                    ok: {
+                        label: 'OK',
+                        className: 'btn-primary'
+                    }
+                }
+            });
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
 });
 </script>
 @endpush

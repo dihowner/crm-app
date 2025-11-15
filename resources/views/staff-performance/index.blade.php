@@ -213,6 +213,7 @@
                                     <th>Rank</th>
                                     <th>Staff</th>
                                     <th>Delivered Orders</th>
+                                    <th>Delivered Units</th>
                                     <th>Total Orders</th>
                                     <th>Delivery Rate</th>
                                     <th>Total Revenue</th>
@@ -243,6 +244,9 @@
                                         </td>
                                         <td>
                                             <span class="badge bg-success">{{ number_format($staff['delivered_orders']) }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">{{ number_format($staff['delivered_units']) }}</span>
                                         </td>
                                         <td>{{ number_format($staff['total_orders']) }}</td>
                                         <td>

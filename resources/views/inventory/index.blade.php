@@ -12,7 +12,7 @@
             <div class="card-body">
                 <form method="GET" action="{{ route('inventory.index') }}">
                     <div class="row">
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="agent_id" class="form-label">Filter by Agent Name</label>
                                 <select class="form-select" id="agent_id" name="agent_id">
@@ -25,7 +25,20 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="product_id" class="form-label">Filter by Product</label>
+                                <select class="form-select" id="product_id" name="product_id">
+                                    <option value="">All Products</option>
+                                    @foreach($allProducts as $product)
+                                        <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
+                                            {{ $product->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <div class="form-check mt-4">
                                     <input class="form-check-input" type="checkbox" id="low_stock_only" name="low_stock_only"
@@ -36,7 +49,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">&nbsp;</label>
                                 <div class="d-flex gap-2">

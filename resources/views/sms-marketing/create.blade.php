@@ -117,25 +117,19 @@
                                 <div class="card-body">
                                     <h6 class="text-primary mb-3">Campaign Summary</h6>
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <div class="text-center">
                                                 <h4 class="mb-1" id="estimated-recipients">-</h4>
                                                 <p class="text-muted mb-0">Estimated Recipients</p>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="text-center">
-                                                <h4 class="mb-1" id="estimated-cost">₦-</h4>
-                                                <p class="text-muted mb-0">Estimated Cost</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <div class="text-center">
                                                 <h4 class="mb-1" id="message-length">-</h4>
                                                 <p class="text-muted mb-0">Message Length</p>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <div class="text-center">
                                                 <h4 class="mb-1" id="sms-count">-</h4>
                                                 <p class="text-muted mb-0">SMS Count</p>
@@ -152,9 +146,6 @@
                         <div class="col-12">
                             <div class="d-flex justify-content-end gap-2">
                                 <a href="{{ route('sms-marketing.index') }}" class="btn btn-light">Cancel</a>
-                                <button type="button" class="btn btn-outline-primary" onclick="previewCampaign()">
-                                    <i class="ti ti-eye me-1"></i>Preview
-                                </button>
                                 <button type="submit" class="btn btn-primary" id="send-campaign-btn">
                                     <i class="ti ti-send me-1"></i>Send Campaign
                                 </button>
@@ -215,33 +206,6 @@ function updatePreview() {
     }
 }
 
-// Preview campaign
-function previewCampaign() {
-    const form = document.getElementById('smsCampaignForm');
-    const formData = new FormData(form);
-
-    // Show loading state
-    const btn = document.querySelector('button[onclick="previewCampaign()"]');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="ti ti-loader-2 me-1"></i>Loading...';
-    btn.disabled = true;
-
-    // Simulate preview (in real implementation, this would call an API)
-    setTimeout(() => {
-        bootbox.alert({
-            message: 'Campaign preview generated! Check the preview section above.',
-            buttons: {
-                ok: {
-                    label: 'OK',
-                    className: 'btn-primary'
-                }
-            }
-        });
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }, 1000);
-}
-
 // Form submission
 document.getElementById('smsCampaignForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -292,17 +256,25 @@ document.getElementById('smsCampaignForm').addEventListener('submit', function(e
 
 // Show campaign stats
 function showCampaignStats(stats) {
-    const statsHtml = `
-        <div class="alert alert-success">
-            <h6>Campaign Sent Successfully!</h6>
-            <p><strong>Total Recipients:</strong> ${stats.total}</p>
-            <p><strong>Successfully Sent:</strong> ${stats.sent}</p>
-            <p><strong>Failed:</strong> ${stats.failed}</p>
-        </div>
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'alert alert-success alert-dismissible fade show';
+    statsDiv.innerHTML = `
+        <h6>Campaign Sent Successfully!</h6>
+        <p><strong>Total Recipients:</strong> ${stats.total}</p>
+        <p><strong>Successfully Sent:</strong> ${stats.sent}</p>
+        <p><strong>Failed:</strong> ${stats.failed}</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
 
     const content = document.querySelector('.content-page');
-    content.insertBefore(document.createElement('div').innerHTML = statsHtml, content.firstChild);
+    if (content) {
+        content.insertBefore(statsDiv, content.firstChild);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            statsDiv.remove();
+        }, 5000);
+    }
 }
 
 // Show alert
@@ -326,18 +298,38 @@ function showAlert(type, message) {
 
 // Load customer count for selected group
 document.getElementById('customer_group').addEventListener('change', function() {
-    // In real implementation, this would fetch actual customer count
-    const customerCounts = {
-        'all': 150,
-        'delivered_orders': 89,
-        'pending_orders': 45,
-        'new_customers': 23,
-        'returning_customers': 66
-    };
-
-    const count = customerCounts[this.value] || 0;
-    document.getElementById('estimated-recipients').textContent = count;
-    document.getElementById('estimated-cost').textContent = '₦' + (count * 0.05).toFixed(2);
+    const customerGroup = this.value;
+    
+    // Show loading state
+    document.getElementById('estimated-recipients').textContent = 'Loading...';
+    
+    // Fetch actual customer count from API
+    fetch(`{{ route('sms-marketing.customer-count') }}?customer_group=${customerGroup}`, {
+        method: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const count = data.count || 0;
+            document.getElementById('estimated-recipients').textContent = count;
+        } else {
+            document.getElementById('estimated-recipients').textContent = '0';
+            console.error('Failed to get customer count:', data.error || 'Unknown error');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching customer count:', error);
+        document.getElementById('estimated-recipients').textContent = 'Error';
+    });
 });
 
 // Initialize

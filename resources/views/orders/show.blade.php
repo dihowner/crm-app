@@ -9,7 +9,20 @@
     <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">
+                    @php
+                        $user = auth()->user();
+                        if ($user->isAdmin()) {
+                            echo 'ADMIN Dashboard';
+                        } elseif ($user->isCSR()) {
+                            echo 'CSR Dashboard';
+                        } elseif ($user->isLogisticManager()) {
+                            echo 'Logistic Manager Dashboard';
+                        } else {
+                            echo 'Dashboard';
+                        }
+                    @endphp
+                </a></li>
                 <li class="breadcrumb-item"><a href="{{ route('orders.index') }}">Orders</a></li>
                 <li class="breadcrumb-item active">Order #{{ $order->order_number }}</li>
             </ol>
@@ -31,13 +44,19 @@
                         'new' => 'bg-primary',
                         'scheduled' => 'bg-warning',
                         'delivered' => 'bg-success',
+                        'not_picking_calls' => 'bg-danger',
                         'not picking calls' => 'bg-danger',
+                        'number_off' => 'bg-secondary',
                         'number off' => 'bg-secondary',
-                        'call back' => 'bg-info'
+                        'call_back' => 'bg-info',
+                        'call back' => 'bg-info',
+                        'cancelled' => 'bg-dark',
+                        'failed' => 'bg-danger',
+                        'paid' => 'bg-success'
                     ];
                     $statusColor = $statusColors[strtolower($order->status)] ?? 'bg-secondary';
                 @endphp
-                <span class="badge {{ $statusColor }} fs-16 px-3 py-2">{{ ucfirst($order->status) }}</span>
+                <span class="badge {{ $statusColor }} fs-16 px-3 py-2">{{ ucwords(str_replace('_', ' ', $order->status)) }}</span>
             </div>
         </div>
     </div>
@@ -70,11 +89,14 @@
                         <p class="text-muted">{{ $order->customer->whatsapp_number ?? 'N/A' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <p class="mb-1"><strong>Location:</strong></p>
+                        <p class="mb-1"><strong>State:</strong></p>
                         <p class="text-muted">{{ $order->customer->state }}</p>
 
                         <p class="mt-3 mb-1"><strong>Address:</strong></p>
                         <p class="text-muted">{{ $order->customer->address }}</p>
+
+                        <p class="mt-3 mb-1"><strong>Source:</strong></p>
+                        <p class="text-muted">{{ $order->source ?? 'Not specified' }}</p>
                     </div>
                 </div>
             </div>
@@ -203,17 +225,36 @@
                         @csrf
                         @method('PATCH')
 
-                        <div class="mb-3">
-                            <label for="status" class="form-label">New Status</label>
-                            <select class="form-select" id="status" name="status" required>
-                                <option value="">Select Status</option>
-                                <option value="new" {{ $order->status === 'new' ? 'selected' : '' }}>New</option>
-                                <option value="scheduled" {{ $order->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-                                <option value="not picking calls" {{ $order->status === 'not picking calls' ? 'selected' : '' }}>Not Picking Calls</option>
-                                <option value="number off" {{ $order->status === 'number off' ? 'selected' : '' }}>Number Off</option>
-                                <option value="call back" {{ $order->status === 'call back' ? 'selected' : '' }}>Call Back</option>
-                                <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">New Status</label>
+                                    <select class="form-select" id="status" name="status" required>
+                                        <option value="">Select Status</option>
+                                        <option value="new" {{ $order->status === 'new' ? 'selected' : '' }}>New</option>
+                                        <option value="scheduled" {{ $order->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                        <option value="not_picking_calls" {{ $order->status === 'not_picking_calls' ? 'selected' : '' }}>Not Picking Calls</option>
+                                        <option value="number_off" {{ $order->status === 'number_off' ? 'selected' : '' }}>Number Off</option>
+                                        <option value="call_back" {{ $order->status === 'call_back' ? 'selected' : '' }}>Call Back</option>
+                                        <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                                        <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                        <option value="failed" {{ $order->status === 'failed' ? 'selected' : '' }}>Failed</option>
+                                        @if($order->status === 'paid')
+                                            <option value="paid" selected>Paid</option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Callback Reminder Field (Hidden by default, shown when Call Back is selected) -->
+                            <div class="col-md-6" id="callback_reminder_field" style="display: none; transition: all 0.3s ease;">
+                                <div class="mb-3">
+                                    <label for="callback_reminder" class="form-label">Callback Date & Time <span class="text-danger">*</span></label>
+                                    <input type="datetime-local" class="form-control" id="callback_reminder" name="callback_reminder" 
+                                           value="{{ $order->callback_reminder ? $order->callback_reminder->format('Y-m-d\TH:i') : '' }}"
+                                           min="{{ now()->format('Y-m-d\TH:i') }}">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -283,9 +324,31 @@
 
 @push('scripts')
 <script>
+// Show/hide callback reminder field when status changes
+document.addEventListener('DOMContentLoaded', function() {
+    const statusSelect = document.getElementById('status');
+    const callbackReminderField = document.getElementById('callback_reminder_field');
+    const callbackReminderInput = document.getElementById('callback_reminder');
+
+    function toggleCallbackField() {
+        if (statusSelect.value === 'call_back') {
+            callbackReminderField.style.display = 'block';
+            callbackReminderInput.required = true;
+        } else {
+            callbackReminderField.style.display = 'none';
+            callbackReminderInput.required = false;
+        }
+    }
+
+    // Check initial state
+    toggleCallbackField();
+
+    // Listen for status changes
+    statusSelect.addEventListener('change', toggleCallbackField);
+});
 function showReassignModal() {
     @php
-        $users = \App\Models\User::whereHas('role', function($q) { $q->whereIn('slug', ['csr', 'admin']); })->get(['id', 'name', 'role_id']);
+        $users = \App\Models\User::whereHas('role', function($q) { $q->where('slug', 'csr'); })->get(['id', 'name', 'role_id']);
         $currentAssignedTo = $order->assigned_to;
     @endphp
 

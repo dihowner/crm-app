@@ -27,10 +27,17 @@ class InventoryController extends Controller
             $query->where('id', $request->agent_id);
         }
 
+        // Filter by product if specified
+        if ($request->filled('product_id')) {
+            $query->whereHas('inventories', function ($q) use ($request) {
+                $q->where('product_id', $request->product_id);
+            });
+        }
+
         // Filter for low stock only
         if ($request->filled('low_stock_only') && $request->low_stock_only) {
             $query->whereHas('inventories', function ($q) {
-                $q->where('current_stock', '<=', 50); // Low stock threshold
+                $q->whereRaw('quantity <= low_stock_threshold');
             });
         }
 
@@ -39,7 +46,19 @@ class InventoryController extends Controller
         // Get all agents for filter dropdown
         $allAgents = Agent::where('status', 'active')->get();
 
-        return view('inventory.index', compact('agents', 'allAgents'));
+        // Get all products for filter dropdown
+        $allProducts = Product::where('is_active', true)->orderBy('name')->get();
+
+        // If product filter is applied, filter the inventories for each agent
+        if ($request->filled('product_id')) {
+            $agents->each(function ($agent) use ($request) {
+                $agent->inventories = $agent->inventories->filter(function ($inventory) use ($request) {
+                    return $inventory->product_id == $request->product_id;
+                });
+            });
+        }
+
+        return view('inventory.index', compact('agents', 'allAgents', 'allProducts'));
     }
 
     public function addStock(Request $request)

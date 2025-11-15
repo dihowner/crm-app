@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('sms_provider')->nullable(); // SMS service provider used
             $table->string('provider_message_id')->nullable(); // Provider's message ID
             $table->text('error_message')->nullable(); // Error details if failed
-            $table->decimal('cost', 8, 2)->default(0.00); // Cost per SMS
+            $table->decimal('cost', 8, 2)->nullable(); // Cost per SMS (from API response)
             $table->foreignId('sent_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('order_id')->nullable()->constrained('orders')->onDelete('set null'); // If related to an order
             $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null'); // If sent to specific customer

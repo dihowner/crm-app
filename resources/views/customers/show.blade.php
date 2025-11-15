@@ -9,7 +9,20 @@
     <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">
+                    @php
+                        $user = auth()->user();
+                        if ($user->isAdmin()) {
+                            echo 'ADMIN Dashboard';
+                        } elseif ($user->isCSR()) {
+                            echo 'CSR Dashboard';
+                        } elseif ($user->isLogisticManager()) {
+                            echo 'Logistic Manager Dashboard';
+                        } else {
+                            echo 'Dashboard';
+                        }
+                    @endphp
+                </a></li>
                 <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Customers</a></li>
                 <li class="breadcrumb-item active">{{ $customer->name }}</li>
             </ol>
@@ -71,7 +84,7 @@
                         <p class="text-muted">{{ $customer->email ?? 'Not provided' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <p class="mb-1"><strong>Location:</strong></p>
+                        <p class="mb-1"><strong>State:</strong></p>
                         <p class="text-muted">{{ $customer->state }}</p>
 
                         <p class="mt-3 mb-1"><strong>Address:</strong></p>
@@ -220,7 +233,7 @@ function copyCustomerInfo(button) {
     const customerInfo = `Customer: {{ $customer->name }}
 Phone: {{ $customer->phone }}
 Email: {{ $customer->email ?? 'Not provided' }}
-Location: {{ $customer->state }}
+State: {{ $customer->state }}
 Address: {{ $customer->address ?? 'Not provided' }}
 Total Spent: ₦{{ number_format($customer->total_spent, 2) }}
 Total Orders: {{ $customer->orders->count() }}

@@ -39,5 +39,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // App Settings Management
     Route::get('app-settings', [\App\Http\Controllers\Admin\AppSettingController::class, 'index'])->name('app-settings.index');
     Route::post('app-settings', [\App\Http\Controllers\Admin\AppSettingController::class, 'update'])->name('app-settings.update');
+    Route::post('app-settings/test-email', [\App\Http\Controllers\Admin\AppSettingController::class, 'testEmail'])->name('app-settings.test-email');
     Route::post('app-settings/reset', [\App\Http\Controllers\Admin\AppSettingController::class, 'reset'])->name('app-settings.reset');
 });

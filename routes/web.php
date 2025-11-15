@@ -71,8 +71,9 @@ Route::middleware(['auth', 'security.headers'])->group(function () {
     Route::get('/sms-marketing', [SmsMarketingController::class, 'index'])->name('sms-marketing.index');
     Route::get('/sms-marketing/create', [SmsMarketingController::class, 'create'])->name('sms-marketing.create');
     Route::post('/sms-marketing', [SmsMarketingController::class, 'store'])->name('sms-marketing.store');
-    Route::get('/sms-marketing/{smsRecord}', [SmsMarketingController::class, 'show'])->name('sms-marketing.show');
+    Route::get('/sms-marketing/customer-count', [SmsMarketingController::class, 'getCustomerCount'])->name('sms-marketing.customer-count');
     Route::get('/sms-marketing/stats/campaign', [SmsMarketingController::class, 'getCampaignStats'])->name('sms-marketing.stats');
+    Route::get('/sms-marketing/{smsRecord}', [SmsMarketingController::class, 'show'])->name('sms-marketing.show');
 
     // Stats Routes (Admin Only)
     Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');

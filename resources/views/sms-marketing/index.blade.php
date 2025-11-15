@@ -235,10 +235,20 @@
                                             <span class="badge {{ $color }}">{{ ucfirst($smsRecord->status) }}</span>
                                         </td>
                                         <td>
-                                            <span class="fw-bold">₦{{ number_format($smsRecord->cost, 2) }}</span>
+                                            @if($smsRecord->cost !== null)
+                                                <span class="fw-bold">₦{{ number_format($smsRecord->cost, 2) }}</span>
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
                                         </td>
                                         <td>{{ $smsRecord->sentBy->name ?? 'Unknown' }}</td>
-                                        <td>{{ $smsRecord->sent_at->format('M d, Y H:i') }}</td>
+                                        <td>
+                                            @if($smsRecord->sent_at)
+                                                {{ $smsRecord->sent_at->format('M d, Y H:i') }}
+                                            @else
+                                                <span class="text-muted">Not sent</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             <a href="{{ route('sms-marketing.show', $smsRecord) }}" class="btn btn-outline-primary btn-sm">
                                                 <i class="ti ti-eye me-1"></i>View
@@ -280,7 +290,14 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('total-sms').textContent = data.total_sms || 0;
             document.getElementById('sent-today').textContent = data.sent_today || 0;
             document.getElementById('delivered-today').textContent = data.delivered_today || 0;
-            document.getElementById('cost-today').textContent = '₦' + (data.cost_today || 0).toFixed(2);
+            
+            // Display cost from API (may be null if API doesn't provide cost)
+            if (data.cost_today !== null && data.cost_today !== undefined) {
+                const costToday = parseFloat(data.cost_today) || 0;
+                document.getElementById('cost-today').textContent = '₦' + costToday.toFixed(2);
+            } else {
+                document.getElementById('cost-today').textContent = 'N/A';
+            }
         })
         .catch(error => {
             console.error('Error loading stats:', error);

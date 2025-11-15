@@ -51,6 +51,16 @@ class OrderController extends Controller
             $query->whereDate('assigned_at', today());
         }
 
+        // Product filter
+        if ($request->filled('product_id')) {
+            $query->where('product_id', $request->product_id);
+        }
+
+        // Source filter
+        if ($request->filled('source')) {
+            $query->where('source', $request->source);
+        }
+
         // Search filter
         if ($request->filled('search')) {
             $search = $request->search;
@@ -68,10 +78,13 @@ class OrderController extends Controller
         $orders = $query->orderBy('created_at', 'desc')->paginate(15);
 
         // Get filter options
-        $statuses = ['new', 'scheduled', 'not picking calls', 'number off', 'call back', 'delivered'];
-        $assignedUsers = User::whereIn('role_id', [2, 3])->get(); // CSR and Logistic Manager
+        $statuses = ['new', 'scheduled', 'not picking calls', 'number off', 'call back', 'delivered', 'failed', 'paid'];
+        $assignedUsers = User::whereHas('role', function($q) {
+            $q->where('slug', 'csr');
+        })->get(); // Only CSR
+        $products = Product::all();
 
-        return view('orders.index', compact('orders', 'statuses', 'assignedUsers'));
+        return view('orders.index', compact('orders', 'statuses', 'assignedUsers', 'products'));
     }
 
     public function todaysOrders(Request $request)
@@ -104,6 +117,11 @@ class OrderController extends Controller
             $query->where('product_id', $request->product_id);
         }
 
+        // Source filter
+        if ($request->filled('source')) {
+            $query->where('source', $request->source);
+        }
+
         // Search filter
         if ($request->filled('search')) {
             $search = $request->search;
@@ -121,8 +139,10 @@ class OrderController extends Controller
         $orders = $query->orderBy('created_at', 'desc')->paginate(15);
 
         // Get filter options
-        $statuses = ['new', 'scheduled', 'not picking calls', 'number off', 'call back', 'delivered'];
-        $assignedUsers = User::whereIn('role_id', [2, 3])->get();
+        $statuses = ['new', 'scheduled', 'not picking calls', 'number off', 'call back', 'delivered', 'failed', 'paid'];
+        $assignedUsers = User::whereHas('role', function($q) {
+            $q->where('slug', 'csr');
+        })->get(); // Only CSR
         $products = Product::all();
 
         return view('orders.todays', compact('orders', 'statuses', 'assignedUsers', 'products'));
@@ -155,6 +175,16 @@ class OrderController extends Controller
             $query->where('assigned_to', $request->assigned_to);
         }
 
+        // Product filter
+        if ($request->filled('product_id')) {
+            $query->where('product_id', $request->product_id);
+        }
+
+        // Source filter
+        if ($request->filled('source')) {
+            $query->where('source', $request->source);
+        }
+
         // Search filter
         if ($request->filled('search')) {
             $search = $request->search;
@@ -172,10 +202,13 @@ class OrderController extends Controller
         $orders = $query->orderBy('scheduled_delivery_date', 'asc')->paginate(15);
 
         // Get filter options
-        $statuses = ['new', 'scheduled', 'not_picking_calls', 'number_off', 'call_back', 'delivered'];
-        $assignedUsers = User::whereIn('role_id', [2, 3])->get();
+        $statuses = ['new', 'scheduled', 'not_picking_calls', 'number_off', 'call_back', 'delivered', 'failed', 'paid'];
+        $assignedUsers = User::whereHas('role', function($q) {
+            $q->where('slug', 'csr');
+        })->get(); // Only CSR
+        $products = Product::all();
 
-        return view('orders.overdue', compact('orders', 'statuses', 'assignedUsers'));
+        return view('orders.overdue', compact('orders', 'statuses', 'assignedUsers', 'products'));
     }
 
     public function show(Order $order)
@@ -205,7 +238,7 @@ class OrderController extends Controller
         $products = Product::where('is_active', true)->get();
         $customers = Customer::all();
         $users = User::whereHas('role', function($q) {
-            $q->whereIn('slug', ['csr', 'admin']);
+            $q->where('slug', 'csr');
         })->get();
         $agents = Agent::all();
 
@@ -219,9 +252,11 @@ class OrderController extends Controller
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
             'unit_price' => 'required|numeric|min:0',
-            'status' => 'required|in:new,scheduled,not_picking_calls,number_off,call_back,delivered,cancelled',
+            'status' => 'required|in:new,scheduled,not_picking_calls,number_off,call_back,delivered,cancelled,failed,paid',
+            'callback_reminder' => 'nullable|date|required_if:status,call_back|after_or_equal:now',
             'assigned_to' => 'nullable|exists:users,id',
             'agent_id' => 'nullable|exists:agents,id',
+            'source' => 'nullable|in:Website purchase,R or R,Messaging',
             'notes' => 'nullable|string',
         ]);
 
@@ -235,6 +270,7 @@ class OrderController extends Controller
                 'total_price' => $request->quantity * $request->unit_price,
                 'status' => $request->status,
                 'agent_id' => $request->agent_id,
+                'source' => $request->source,
                 'notes' => $request->notes,
             ];
 
@@ -244,9 +280,47 @@ class OrderController extends Controller
                 $updateData['assigned_at'] = $request->assigned_to ? now() : null;
             }
 
+            // Handle callback reminder
+            if ($request->status === 'call_back' && $request->filled('callback_reminder')) {
+                $updateData['callback_reminder'] = $request->callback_reminder;
+            } elseif ($request->status !== 'call_back') {
+                // Clear callback reminder if status is changed away from call_back
+                $updateData['callback_reminder'] = null;
+            }
+
+            // Track if status changed to delivered
+            $statusChangedToDelivered = $order->status !== 'delivered' && $request->status === 'delivered';
+
+            // Track if status changed to call_back
+            $oldStatus = $order->status;
+            $statusChangedToCallBack = $oldStatus !== 'call_back' && $request->status === 'call_back';
+
             $order->update($updateData);
 
             DB::commit();
+
+            // Send delivery notification email if status changed to delivered
+            if ($statusChangedToDelivered) {
+                try {
+                    $emailService = new \App\Services\EmailService();
+                    $emailService->sendDeliveryNotification($order->fresh(['customer', 'product', 'agent']));
+                } catch (\Exception $e) {
+                    // Log error but don't fail the order update
+                    \Log::error('Failed to send delivery notification email: ' . $e->getMessage());
+                }
+            }
+
+            // Send callback reminder email if status changed to call_back with reminder time
+            if ($statusChangedToCallBack && $order->callback_reminder && $order->assignedUser) {
+                try {
+                    $emailService = new \App\Services\EmailService();
+                    $emailService->sendCallbackReminder($order->fresh(['customer', 'product', 'assignedUser']));
+                } catch (\Exception $e) {
+                    // Log error but don't fail the order update
+                    \Log::error('Failed to send callback reminder email: ' . $e->getMessage());
+                }
+            }
+
             return redirect()->route('orders.show', $order)->with('success', 'Order updated successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -272,13 +346,20 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:new,scheduled,not_picking_calls,number_off,call_back,delivered,cancelled',
+            'status' => 'required|in:new,scheduled,not_picking_calls,number_off,call_back,delivered,cancelled,failed,paid',
             'scheduled_delivery_date' => 'nullable|date',
+            'callback_reminder' => 'nullable|date|required_if:status,call_back|after_or_equal:now',
             'tracking_number' => 'nullable|string|max:100',
             'notes' => 'nullable|string|max:500'
         ]);
 
         $oldStatus = $order->status;
+
+        // Track if status changed to delivered
+        $statusChangedToDelivered = $oldStatus !== 'delivered' && $request->status === 'delivered';
+
+        // Track if status changed to call_back
+        $statusChangedToCallBack = $oldStatus !== 'call_back' && $request->status === 'call_back';
 
         // Update order with additional fields
         $updateData = [
@@ -292,6 +373,14 @@ class OrderController extends Controller
 
         if ($request->filled('tracking_number')) {
             $updateData['tracking_number'] = $request->tracking_number;
+        }
+
+        // Handle callback reminder
+        if ($request->status === 'call_back' && $request->filled('callback_reminder')) {
+            $updateData['callback_reminder'] = $request->callback_reminder;
+        } elseif ($request->status !== 'call_back') {
+            // Clear callback reminder if status is changed away from call_back
+            $updateData['callback_reminder'] = null;
         }
 
         $order->update($updateData);
@@ -309,6 +398,28 @@ class OrderController extends Controller
             'notes' => $statusChangeMessage,
             'changed_by' => Auth::id()
         ]);
+
+        // Send delivery notification email if status changed to delivered
+        if ($statusChangedToDelivered) {
+            try {
+                $emailService = new \App\Services\EmailService();
+                $emailService->sendDeliveryNotification($order->fresh(['customer', 'product', 'agent']));
+            } catch (\Exception $e) {
+                // Log error but don't fail the status update
+                \Log::error('Failed to send delivery notification email: ' . $e->getMessage());
+            }
+        }
+
+        // Send callback reminder email if status changed to call_back with reminder time
+        if ($statusChangedToCallBack && $order->callback_reminder && $order->assignedUser) {
+            try {
+                $emailService = new \App\Services\EmailService();
+                $emailService->sendCallbackReminder($order->fresh(['customer', 'product', 'assignedUser']));
+            } catch (\Exception $e) {
+                // Log error but don't fail the status update
+                \Log::error('Failed to send callback reminder email: ' . $e->getMessage());
+            }
+        }
 
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }
@@ -351,7 +462,8 @@ class OrderController extends Controller
 
         $products = Product::all();
         $agents = Agent::where('status', 'active')->get();
-        $statuses = ['new', 'scheduled', 'not picking calls', 'number off', 'call back', 'delivered'];
+        // Exclude 'paid' from manual status selection - it's automatically set when payment is added
+        $statuses = ['new', 'scheduled', 'not picking calls', 'number off', 'call back', 'delivered', 'failed'];
 
         return view('orders.create', compact('products', 'agents', 'statuses'));
     }
@@ -366,39 +478,48 @@ class OrderController extends Controller
         $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:20',
+            'customer_email' => 'nullable|email|max:255',
             'customer_whatsapp' => 'nullable|string|max:20',
             'customer_address' => 'required|string|max:500',
             'customer_state' => 'required|string|max:100',
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
             'unit_price' => 'required|numeric|min:0',
-            'status' => 'required|in:new,scheduled,not picking calls,number off,call back,delivered',
+            'status' => 'required|in:new,scheduled,not picking calls,number off,call back,delivered,failed,paid',
             'notes' => 'nullable|string|max:500',
             'agent_id' => 'nullable|exists:agents,id',
+            'source' => 'nullable|in:Website purchase,R or R,Messaging',
         ]);
 
         DB::beginTransaction();
         try {
-            // Create or find customer
-            $customer = Customer::firstOrCreate(
-                ['phone' => $request->customer_phone],
-                [
-                    'name' => $request->customer_name,
-                    'whatsapp_number' => $request->customer_whatsapp,
-                    'address' => $request->customer_address,
-                    'state' => $request->customer_state,
-                    'email' => null, // Will be added later if needed
-                ]
-            );
+            // Create or find customer by name + phone combination
+            $customer = Customer::where('name', $request->customer_name)
+                ->where('phone', $request->customer_phone)
+                ->first();
 
-            // Update customer info if it exists but has different details
-            if ($customer->wasRecentlyCreated === false) {
-                $customer->update([
+            if (!$customer) {
+                // Create new customer
+                $customer = Customer::create([
                     'name' => $request->customer_name,
+                    'phone' => $request->customer_phone,
+                    'email' => $request->customer_email,
                     'whatsapp_number' => $request->customer_whatsapp,
                     'address' => $request->customer_address,
                     'state' => $request->customer_state,
                 ]);
+            } else {
+                // Update customer info if it exists (update email if provided and customer doesn't have one, or if provided)
+                $updateData = [
+                    'whatsapp_number' => $request->customer_whatsapp,
+                    'address' => $request->customer_address,
+                    'state' => $request->customer_state,
+                ];
+                // Only update email if provided and customer doesn't have one, or always update if provided
+                if ($request->customer_email) {
+                    $updateData['email'] = $request->customer_email;
+                }
+                $customer->update($updateData);
             }
 
             // Generate order number
@@ -407,14 +528,25 @@ class OrderController extends Controller
             // Calculate total price
             $totalPrice = $request->quantity * $request->unit_price;
 
+            // Assign order to available CSR randomly (respecting max_orders_per_day and is_active)
+            $assignedCsr = $this->getAvailableCSR();
+            
+            if (!$assignedCsr) {
+                DB::rollback();
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'No available CSR to assign order. All CSRs are either inactive or have reached their daily order limit.');
+            }
+
             // Create order
             $order = Order::create([
                 'order_number' => $orderNumber,
                 'customer_id' => $customer->id,
                 'product_id' => $request->product_id,
-                'assigned_to' => Auth::id(), // Assign to current CSR
+                'assigned_to' => $assignedCsr->id, // Assign to random available CSR
                 'assigned_at' => now(), // Set assignment timestamp
                 'agent_id' => $request->agent_id,
+                'source' => $request->source,
                 'quantity' => $request->quantity,
                 'unit_price' => $request->unit_price,
                 'total_price' => $totalPrice,
@@ -434,6 +566,15 @@ class OrderController extends Controller
 
             DB::commit();
 
+            // Send order confirmation email to customer
+            try {
+                $emailService = new \App\Services\EmailService();
+                $emailService->sendOrderConfirmation($order->fresh(['customer', 'product']));
+            } catch (\Exception $e) {
+                // Log error but don't fail the order creation
+                \Log::error('Failed to send order confirmation email: ' . $e->getMessage());
+            }
+
             // For CSR users, redirect to orders list instead of order view to avoid permission issues
             if (Auth::user()->isCSR()) {
                 return redirect()->route('orders.index')
@@ -449,5 +590,49 @@ class OrderController extends Controller
                            ->withInput()
                            ->with('error', 'Failed to create order: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get an available CSR for order assignment
+     * - Only active CSRs (is_active = true)
+     * - Must not exceed max_orders_per_day
+     * - Random selection from available CSRs
+     * 
+     * @return User|null
+     */
+    private function getAvailableCSR()
+    {
+        // Get all active CSR users
+        $activeCSRs = User::whereHas('role', function($query) {
+            $query->where('slug', 'csr');
+        })
+        ->where('is_active', true)
+        ->get();
+
+        if ($activeCSRs->isEmpty()) {
+            return null; // No active CSRs available
+        }
+
+        // Filter CSRs who haven't reached their daily limit
+        $todayStart = now()->startOfDay();
+        $todayEnd = now()->endOfDay();
+
+        $availableCSRs = $activeCSRs->filter(function($csr) use ($todayStart, $todayEnd) {
+            // Count orders assigned to this CSR today
+            $todayOrdersCount = Order::where('assigned_to', $csr->id)
+                ->whereBetween('assigned_at', [$todayStart, $todayEnd])
+                ->count();
+
+            // Check if CSR has reached their daily limit
+            $maxOrders = $csr->max_orders_per_day ?? 50; // Default to 50 if not set
+            return $todayOrdersCount < $maxOrders;
+        });
+
+        if ($availableCSRs->isEmpty()) {
+            return null; // All CSRs have reached their daily limit
+        }
+
+        // Randomly select from available CSRs
+        return $availableCSRs->random();
     }
 }

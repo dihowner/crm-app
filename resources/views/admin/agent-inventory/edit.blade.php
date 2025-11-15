@@ -10,7 +10,20 @@
             <div class="page-title-box">
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">
+                            @php
+                                $user = auth()->user();
+                                if ($user->isAdmin()) {
+                                    echo 'ADMIN Dashboard';
+                                } elseif ($user->isCSR()) {
+                                    echo 'CSR Dashboard';
+                                } elseif ($user->isLogisticManager()) {
+                                    echo 'Logistic Manager Dashboard';
+                                } else {
+                                    echo 'Dashboard';
+                                }
+                            @endphp
+                        </a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.agent-inventory.index') }}">Agent Inventory</a></li>
                         <li class="breadcrumb-item active">Edit Inventory</li>
                     </ol>

@@ -19,6 +19,11 @@ class SmsMarketingController extends Controller
             abort(403, 'You do not have permission to access SMS Marketing.');
         }
 
+        // CSR users cannot access SMS Marketing
+        if (Auth::user()->isCSR()) {
+            abort(403, 'Access denied. CSR users cannot access SMS Marketing.');
+        }
+
         // Logistic Managers can only access inventory pages
         if (Auth::user()->isLogisticManager()) {
             abort(403, 'Access denied. Logistic Managers can only access inventory management.');
@@ -85,6 +90,11 @@ class SmsMarketingController extends Controller
             abort(403, 'You do not have permission to access SMS Marketing.');
         }
 
+        // CSR users cannot access SMS Marketing
+        if (Auth::user()->isCSR()) {
+            abort(403, 'Access denied. CSR users cannot access SMS Marketing.');
+        }
+
         // Get customer groups for targeting
         $customerGroups = [
             'all' => 'All Customers',
@@ -111,6 +121,11 @@ class SmsMarketingController extends Controller
         // Check permissions
         if (!Auth::user()->hasPermission('sms_marketing')) {
             return response()->json(['error' => 'Unauthorized access.'], 403);
+        }
+
+        // CSR users cannot access SMS Marketing
+        if (Auth::user()->isCSR()) {
+            return response()->json(['error' => 'Access denied. CSR users cannot access SMS Marketing.'], 403);
         }
 
         $request->validate([
@@ -194,6 +209,11 @@ class SmsMarketingController extends Controller
             abort(403, 'You do not have permission to access SMS Marketing.');
         }
 
+        // CSR users cannot access SMS Marketing
+        if (Auth::user()->isCSR()) {
+            abort(403, 'Access denied. CSR users cannot access SMS Marketing.');
+        }
+
         $smsRecord->load(['sentBy', 'customer', 'order']);
 
         return view('sms-marketing.show', compact('smsRecord'));
@@ -203,25 +223,74 @@ class SmsMarketingController extends Controller
     {
         switch ($customerGroup) {
             case 'all':
-                return Customer::all();
+                // Return unique customers by name+phone combination
+                return Customer::select('customers.*')
+                    ->join(DB::raw('(SELECT name, phone, MIN(id) as min_id FROM customers GROUP BY name, phone) as unique_customers'), function($join) {
+                        $join->on('customers.name', '=', 'unique_customers.name')
+                             ->on('customers.phone', '=', 'unique_customers.phone')
+                             ->on('customers.id', '=', 'unique_customers.min_id');
+                    })
+                    ->get();
 
             case 'delivered_orders':
-                return Customer::whereHas('orders', function ($query) {
+                // Return unique customers who have delivered orders
+                $customerIds = Customer::whereHas('orders', function ($query) {
                     $query->where('status', 'delivered');
-                })->get();
+                })->pluck('id');
+                
+                if ($customerIds->isEmpty()) {
+                    return collect();
+                }
+                
+                return Customer::whereIn('id', $customerIds)
+                    ->select('customers.*')
+                    ->join(DB::raw('(SELECT name, phone, MIN(id) as min_id FROM customers WHERE id IN (' . $customerIds->implode(',') . ') GROUP BY name, phone) as unique_customers'), function($join) {
+                        $join->on('customers.name', '=', 'unique_customers.name')
+                             ->on('customers.phone', '=', 'unique_customers.phone')
+                             ->on('customers.id', '=', 'unique_customers.min_id');
+                    })
+                    ->get();
 
             case 'pending_orders':
-                return Customer::whereHas('orders', function ($query) {
-                    $query->whereIn('status', ['new', 'scheduled', 'not picking calls', 'number off', 'call back']);
-                })->get();
+                // Return unique customers who have pending orders
+                $customerIds = Customer::whereHas('orders', function ($query) {
+                    $query->whereIn('status', ['new', 'scheduled', 'not_picking_calls', 'number_off', 'call_back']);
+                })->pluck('id');
+                
+                if ($customerIds->isEmpty()) {
+                    return collect();
+                }
+                
+                return Customer::whereIn('id', $customerIds)
+                    ->select('customers.*')
+                    ->join(DB::raw('(SELECT name, phone, MIN(id) as min_id FROM customers WHERE id IN (' . $customerIds->implode(',') . ') GROUP BY name, phone) as unique_customers'), function($join) {
+                        $join->on('customers.name', '=', 'unique_customers.name')
+                             ->on('customers.phone', '=', 'unique_customers.phone')
+                             ->on('customers.id', '=', 'unique_customers.min_id');
+                    })
+                    ->get();
 
             case 'new_customers':
-                return Customer::where('created_at', '>=', now()->subDays(30))->get();
+                // Return unique customers created in last 30 days
+                return Customer::where('created_at', '>=', now()->subDays(30))
+                    ->select('customers.*')
+                    ->join(DB::raw('(SELECT name, phone, MIN(id) as min_id FROM customers GROUP BY name, phone) as unique_customers'), function($join) {
+                        $join->on('customers.name', '=', 'unique_customers.name')
+                             ->on('customers.phone', '=', 'unique_customers.phone')
+                             ->on('customers.id', '=', 'unique_customers.min_id');
+                    })
+                    ->get();
 
             case 'returning_customers':
-                return Customer::whereHas('orders', function ($query) {
-                    $query->where('status', 'delivered');
-                })->where('created_at', '<', now()->subDays(30))->get();
+                // Returning Customers: Unique name+phone combinations that have duplicate records
+                // Return only one record per unique name+phone combination (the one with the minimum ID)
+                return Customer::select('customers.*')
+                    ->join(DB::raw('(SELECT name, phone, MIN(id) as min_id FROM customers GROUP BY name, phone HAVING COUNT(*) > 1) as duplicate_customers'), function($join) {
+                        $join->on('customers.name', '=', 'duplicate_customers.name')
+                             ->on('customers.phone', '=', 'duplicate_customers.phone')
+                             ->on('customers.id', '=', 'duplicate_customers.min_id');
+                    })
+                    ->get();
 
             default:
                 return collect();
@@ -245,15 +314,58 @@ class SmsMarketingController extends Controller
             abort(403, 'You do not have permission to access SMS Marketing.');
         }
 
+        // CSR users cannot access SMS Marketing
+        if (Auth::user()->isCSR()) {
+            abort(403, 'Access denied. CSR users cannot access SMS Marketing.');
+        }
+
         $stats = [
             'total_sms' => SmsRecord::count(),
             'sent_today' => SmsRecord::whereDate('sent_at', today())->count(),
             'delivered_today' => SmsRecord::whereDate('delivered_at', today())->count(),
             'failed_today' => SmsRecord::whereDate('sent_at', today())->where('status', 'failed')->count(),
-            'total_cost' => SmsRecord::sum('cost'),
-            'cost_today' => SmsRecord::whereDate('sent_at', today())->sum('cost')
+            'total_cost' => (float) SmsRecord::whereNotNull('cost')->sum('cost'),
+            'cost_today' => (float) SmsRecord::whereDate('sent_at', today())->whereNotNull('cost')->sum('cost')
         ];
 
         return response()->json($stats);
+    }
+
+    public function getCustomerCount(Request $request)
+    {
+        // CSR users cannot access SMS Marketing
+        if (Auth::user()->isCSR()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Access denied. CSR users cannot access SMS Marketing.'
+            ], 403);
+        }
+
+        // Logistic Managers can only access inventory pages
+        if (Auth::user()->isLogisticManager()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Access denied. Logistic Managers can only access inventory management.'
+            ], 403);
+        }
+
+        $request->validate([
+            'customer_group' => 'required|string|in:all,delivered_orders,pending_orders,new_customers,returning_customers'
+        ]);
+
+        try {
+            $customers = $this->getTargetCustomers($request->customer_group);
+            $count = $customers->count();
+
+            return response()->json([
+                'success' => true,
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to get customer count: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

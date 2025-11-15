@@ -9,7 +9,20 @@
     <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">
+                    @php
+                        $user = auth()->user();
+                        if ($user->isAdmin()) {
+                            echo 'ADMIN Dashboard';
+                        } elseif ($user->isCSR()) {
+                            echo 'CSR Dashboard';
+                        } elseif ($user->isLogisticManager()) {
+                            echo 'Logistic Manager Dashboard';
+                        } else {
+                            echo 'Dashboard';
+                        }
+                    @endphp
+                </a></li>
                 <li class="breadcrumb-item"><a href="{{ route('orders.index') }}">Orders</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('orders.show', $order) }}">Order #{{ $order->order_number }}</a></li>
                 <li class="breadcrumb-item active">Edit</li>
@@ -122,7 +135,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="order_status" class="form-label">Status</label>
                                 <select class="form-select @error('status') is-invalid @enderror" id="order_status" name="status" required>
@@ -133,6 +146,10 @@
                                     <option value="call_back" {{ $order->status == 'call_back' ? 'selected' : '' }}>Call Back</option>
                                     <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
                                     <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                    <option value="failed" {{ $order->status == 'failed' ? 'selected' : '' }}>Failed</option>
+                                    @if($order->status == 'paid')
+                                        <option value="paid" selected>Paid</option>
+                                    @endif
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -140,7 +157,20 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <!-- Callback Reminder Field (Hidden by default, shown when Call Back is selected) -->
+                        <div class="col-md-3" id="callback_reminder_field" style="display: none; transition: all 0.3s ease;">
+                            <div class="mb-3">
+                                <label for="callback_reminder" class="form-label">Callback Date & Time <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control @error('callback_reminder') is-invalid @enderror" id="callback_reminder" name="callback_reminder" 
+                                       value="{{ old('callback_reminder', $order->callback_reminder ? $order->callback_reminder->format('Y-m-d\TH:i') : '') }}"
+                                       min="{{ now()->format('Y-m-d\TH:i') }}">
+                                @error('callback_reminder')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-3" id="assigned_to_col">
                             <div class="mb-3">
                                 <label for="assigned_to" class="form-label">Assigned To</label>
                                 <select class="form-select @error('assigned_to') is-invalid @enderror" id="assigned_to" name="assigned_to">
@@ -157,7 +187,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3" id="agent_col">
                             <div class="mb-3">
                                 <label for="agent_id" class="form-label">Delivery Agent</label>
                                 <select class="form-select @error('agent_id') is-invalid @enderror" id="agent_id" name="agent_id">
@@ -169,6 +199,21 @@
                                     @endforeach
                                 </select>
                                 @error('agent_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-3" id="source_col">
+                            <div class="mb-3">
+                                <label for="source" class="form-label">Source</label>
+                                <select class="form-select @error('source') is-invalid @enderror" id="source" name="source">
+                                    <option value="">Select Source</option>
+                                    <option value="Website purchase" {{ $order->source == 'Website purchase' ? 'selected' : '' }}>Website purchase</option>
+                                    <option value="R or R" {{ $order->source == 'R or R' ? 'selected' : '' }}>R or R</option>
+                                    <option value="Messaging" {{ $order->source == 'Messaging' ? 'selected' : '' }}>Messaging</option>
+                                </select>
+                                @error('source')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -226,6 +271,47 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide callback reminder field when status changes
+    const statusSelect = document.getElementById('order_status');
+    const callbackReminderField = document.getElementById('callback_reminder_field');
+    const callbackReminderInput = document.getElementById('callback_reminder');
+
+    function toggleCallbackField() {
+        const sourceCol = document.getElementById('source_col');
+        
+        if (statusSelect && statusSelect.value === 'call_back') {
+            if (callbackReminderField) {
+                callbackReminderField.style.display = 'block';
+            }
+            // Hide Source field when callback is active
+            if (sourceCol) {
+                sourceCol.style.display = 'none';
+            }
+            if (callbackReminderInput) {
+                callbackReminderInput.required = true;
+            }
+        } else {
+            if (callbackReminderField) {
+                callbackReminderField.style.display = 'none';
+            }
+            // Show Source field when callback is not active
+            if (sourceCol) {
+                sourceCol.style.display = 'block';
+            }
+            if (callbackReminderInput) {
+                callbackReminderInput.required = false;
+            }
+        }
+    }
+
+    // Check initial state
+    if (statusSelect) {
+        toggleCallbackField();
+        // Listen for status changes
+        statusSelect.addEventListener('change', toggleCallbackField);
+    }
+
+    // Auto-calculate total price
     const quantityInput = document.getElementById('quantity');
     const unitPriceInput = document.getElementById('unit_price');
     const totalPriceInput = document.getElementById('total_price');

@@ -93,6 +93,9 @@ class UserController extends Controller
                 ->withInput();
         }
 
+        // Store plain password before hashing (for email)
+        $plainPassword = $request->password;
+
         $user = User::create([
             'name' => $request->username,
             'email' => $request->email,
@@ -104,8 +107,31 @@ class UserController extends Controller
             'password_changed_at' => now(),
         ]);
 
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully.');
+        // Load role relationship for email
+        $user->load('role');
+
+        // Send welcome email with login credentials
+        try {
+            $emailService = new \App\Services\EmailService();
+            $emailResult = $emailService->sendUserWelcomeEmail($user, $plainPassword);
+            
+            if ($emailResult['success']) {
+                return redirect()->route('admin.users.index')
+                    ->with('success', 'User created successfully and welcome email sent!');
+            } else {
+                // User created but email failed
+                \Log::warning('User created but email failed: ' . ($emailResult['error'] ?? 'Unknown error'));
+                return redirect()->route('admin.users.index')
+                    ->with('success', 'User created successfully, but failed to send welcome email.')
+                    ->with('warning', 'Email error: ' . ($emailResult['error'] ?? 'Unknown error'));
+            }
+        } catch (\Exception $e) {
+            // User created but email failed
+            \Log::error('Failed to send welcome email to new user: ' . $e->getMessage());
+            return redirect()->route('admin.users.index')
+                ->with('success', 'User created successfully, but failed to send welcome email.')
+                ->with('warning', 'Email error: ' . $e->getMessage());
+        }
     }
 
     public function edit(User $user)

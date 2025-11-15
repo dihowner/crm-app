@@ -71,6 +71,9 @@ class ProductForm extends Model
   <label>WhatsApp Number</label>
   <input type="tel" name="whatsapp_number" placeholder="0701234..." style="width: 100%; padding: 10px; margin-bottom: 10px;" />
 
+  <label>Email Address</label>
+  <input type="email" name="email" placeholder="customer@example.com" style="width: 100%; padding: 10px; margin-bottom: 10px;" />
+
   <label>Select your package <span style="color: red">*</span></label>
   <select name="package" required style="width: 100%; padding: 10px; margin-bottom: 10px;">
     <option value="">-- Select Package --</option>

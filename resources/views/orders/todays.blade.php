@@ -57,18 +57,31 @@
                     </div>
 
                     <div class="col-md-3">
+                        <label for="source" class="form-label">Source</label>
+                        <select class="form-select" id="source" name="source">
+                            <option value="">All Sources</option>
+                            <option value="Website purchase" {{ request('source') == 'Website purchase' ? 'selected' : '' }}>Website purchase</option>
+                            <option value="R or R" {{ request('source') == 'R or R' ? 'selected' : '' }}>R or R</option>
+                            <option value="Messaging" {{ request('source') == 'Messaging' ? 'selected' : '' }}>Messaging</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
                         <label for="search" class="form-label">Search</label>
                         <input type="text" class="form-control" id="search" name="search"
                                placeholder="Search by name, phone, product..." value="{{ request('search') }}">
                     </div>
 
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="ti ti-search me-1"></i> Filter
-                        </button>
-                        <a href="{{ route('orders.todays') }}" class="btn btn-secondary">
-                            <i class="ti ti-x me-1"></i> Clear
-                        </a>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="ti ti-search me-1"></i> Filter
+                            </button>
+                            <a href="{{ route('orders.todays') }}" class="btn btn-secondary flex-fill">
+                                <i class="ti ti-x me-1"></i> Clear
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -110,11 +123,17 @@
                                                 'scheduled' => 'bg-warning',
                                                 'delivered' => 'bg-success',
                                                 'not picking calls' => 'bg-danger',
+                                                'not_picking_calls' => 'bg-danger',
                                                 'number off' => 'bg-secondary',
-                                                'call back' => 'bg-info'
+                                                'number_off' => 'bg-secondary',
+                                                'call back' => 'bg-info',
+                                                'call_back' => 'bg-info',
+                                                'cancelled' => 'bg-dark',
+                                                'failed' => 'bg-danger',
+                                                'paid' => 'bg-success'
                                             ];
                                             $statusColor = $statusColors[strtolower($order->status)] ?? 'bg-secondary';
-                                            $statusDisplay = ucfirst($order->status);
+                                            $statusDisplay = ucwords(str_replace('_', ' ', $order->status));
                                         @endphp
                                         <span class="badge {{ $statusColor }} text-white">{{ $statusDisplay }}</span>
                                     </td>

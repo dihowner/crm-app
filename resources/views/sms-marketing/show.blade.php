@@ -63,7 +63,13 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Cost</label>
-                                        <p class="mb-0 fw-bold text-success">₦{{ number_format($smsRecord->cost, 2) }}</p>
+                                        <p class="mb-0 fw-bold text-success">
+                                            @if($smsRecord->cost !== null)
+                                                ₦{{ number_format($smsRecord->cost, 2) }}
+                                            @else
+                                                <span class="text-muted">N/A (Cost not provided by API)</span>
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -105,7 +111,13 @@
                                 <div class="card bg-primary-subtle">
                                     <div class="card-body text-center">
                                         <h6 class="text-primary mb-1">Sent At</h6>
-                                        <p class="mb-0">{{ $smsRecord->sent_at->format('M d, Y H:i') }}</p>
+                                        <p class="mb-0">
+                                            @if($smsRecord->sent_at)
+                                                {{ $smsRecord->sent_at->format('M d, Y H:i') }}
+                                            @else
+                                                <span class="text-muted">Not sent</span>
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -114,7 +126,13 @@
                                     <div class="card bg-success-subtle">
                                         <div class="card-body text-center">
                                             <h6 class="text-success mb-1">Delivered At</h6>
-                                            <p class="mb-0">{{ $smsRecord->delivered_at->format('M d, Y H:i') }}</p>
+                                            <p class="mb-0">
+                                                @if($smsRecord->delivered_at)
+                                                    {{ $smsRecord->delivered_at->format('M d, Y H:i') }}
+                                                @else
+                                                    <span class="text-muted">Not delivered</span>
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
