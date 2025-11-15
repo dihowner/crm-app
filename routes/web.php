@@ -84,5 +84,8 @@ Route::middleware(['auth', 'security.headers'])->group(function () {
     Route::get('/staff-performance/stats', [StaffPerformanceController::class, 'getStaffStats'])->name('staff-performance.stats');
 });
 
+// External Form Submission Route (Public - No Auth Required)
+Route::post('/external/order', [\App\Http\Controllers\ExternalFormController::class, 'handleFormSubmission'])->name('external.order.submit');
+
 // Include Admin Routes
 require __DIR__.'/admin.php';

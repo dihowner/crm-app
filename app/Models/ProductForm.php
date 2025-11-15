@@ -59,7 +59,7 @@ class ProductForm extends Model
             $stateOptions .= '<option value="' . $state . '">' . $state . '</option>' . "\n";
         }
 
-        $html = '<form method="POST" action="' . $this->redirect_url . '" style="max-width: 600px; margin: auto;" id="orderForm">
+        $html = '<form method="POST" action="' . route('external.order.submit') . '" style="max-width: 600px; margin: auto;" id="orderForm">
   <input type="hidden" name="form_id" value="' . $this->id . '">
 
   <label>Full Name <span style="color: red">*</span></label>

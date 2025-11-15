@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Apply security headers globally
         $middleware->append(\App\Http\Middleware\SecurityHeadersMiddleware::class);
+
+        // Exclude CSRF protection for external form submission endpoint
+        $middleware->validateCsrfTokens(except: [
+            'external/order',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
